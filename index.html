@@ -1,0 +1,436 @@
+<div id="app"></div>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Quicksand:wght@500;600;700&display=swap');
+
+  #app {
+    --bg1: #EAF4FF;
+    --bg2: #F3F8FF;
+    --ink: #1F3A4D;
+    --ink-soft: #6E8A9C;
+    --pink: #4FA8E8;
+    --pink-deep: #2D82C9;
+    --lilac: #7FC8E0;
+    --mint: #FFD873;
+    --card: #FFFFFF;
+    --border: #E0EEF9;
+
+    font-family: 'Quicksand', -apple-system, sans-serif;
+    background: linear-gradient(160deg, var(--bg1), var(--bg2));
+    color: var(--ink);
+    border-radius: 24px;
+    padding: 30px 18px;
+    max-width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+  }
+  #app * { box-sizing: border-box; }
+  #app::before, #app::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(2px);
+    opacity: 0.35;
+    pointer-events: none;
+  }
+  #app::before {
+    width: 140px; height: 140px;
+    background: var(--mint);
+    top: -50px; right: -40px;
+  }
+  #app::after {
+    width: 100px; height: 100px;
+    background: var(--lilac);
+    bottom: -30px; left: -30px;
+  }
+
+  .container { max-width: 540px; margin: 0 auto; position: relative; z-index: 1; }
+
+  .header { text-align: center; margin-bottom: 22px; }
+  .header .emoji { font-size: 34px; display: block; margin-bottom: 4px; }
+  .header h1 {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    margin: 0 0 6px;
+    color: var(--ink);
+  }
+  .header p {
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin: 0;
+    font-weight: 600;
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: 22px;
+    padding: 22px;
+    margin-bottom: 16px;
+    box-shadow: 0 8px 24px rgba(120, 170, 210, 0.18);
+    border: 2px solid var(--border);
+  }
+
+  .step-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #fff;
+    background: linear-gradient(135deg, var(--pink), var(--lilac));
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+
+  .setup-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .field input[type=number], .field input[type=text] {
+    width: 100%;
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    padding: 11px 14px;
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    background: #FFFBFD;
+    color: var(--ink);
+  }
+  .field input:focus {
+    outline: none;
+    border-color: var(--pink);
+  }
+  .field input[type=color] {
+    width: 100%;
+    height: 44px;
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    padding: 4px;
+    background: #FFFBFD;
+    cursor: pointer;
+  }
+  .field .hint {
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    margin-top: 5px;
+    font-weight: 600;
+  }
+
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 16px;
+    border: none;
+    font-family: 'Fredoka', sans-serif;
+    font-weight: 600;
+    font-size: 15.5px;
+    cursor: pointer;
+    transition: transform 0.1s ease, box-shadow 0.15s ease;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--pink), var(--pink-deep));
+    color: #fff;
+    margin-top: 16px;
+    box-shadow: 0 6px 16px rgba(45, 130, 201, 0.32);
+  }
+  .btn-primary:hover { box-shadow: 0 8px 20px rgba(45, 130, 201, 0.42); }
+  .btn-ghost {
+    background: transparent;
+    color: var(--ink-soft);
+    font-weight: 700;
+    font-size: 13px;
+    padding: 8px 12px;
+  }
+  .btn-ghost:hover { color: var(--pink-deep); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .stage-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 4px 0 2px;
+  }
+
+  .conc-display { text-align: center; margin-top: 12px; }
+  .conc-display .value {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.1;
+  }
+  .conc-display .label {
+    font-size: 12px;
+    color: var(--ink-soft);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  .dilute-controls { margin-top: 20px; }
+
+  .calc-line {
+    margin-top: 14px;
+    padding: 13px 16px;
+    background: linear-gradient(135deg, #F0F8FF, #EAF6FF);
+    border-radius: 14px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    text-align: center;
+    line-height: 1.6;
+  }
+  .calc-line b { color: var(--ink); }
+  .calc-line .eq { color: var(--pink-deep); font-weight: 700; }
+
+  .history-title {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 2px 0 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .history-strip {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    padding: 4px 4px 8px;
+  }
+  .history-item {
+    flex: 0 0 auto;
+    text-align: center;
+    opacity: 0.5;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+  .history-item.active { opacity: 1; transform: scale(1.06); }
+  .history-item .num {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ink-soft);
+    margin-top: 6px;
+  }
+  .history-item .val {
+    font-size: 11px;
+    color: var(--ink-soft);
+    font-weight: 600;
+  }
+
+  .empty {
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: 14px 10px 6px;
+    line-height: 1.6;
+  }
+
+  .top-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 10px;
+  }
+</style>
+
+<script>
+(function(){
+  const root = document.getElementById('app');
+
+  let C0 = 100;
+  let baseColor = '#4FA8E8';
+  let steps = [];
+
+  function hexToRgb(hex){
+    const v = parseInt(hex.slice(1),16);
+    return [(v>>16)&255,(v>>8)&255,v&255];
+  }
+  function rgbToHex(r,g,b){
+    return '#' + [r,g,b].map(x=>Math.round(Math.max(0,Math.min(255,x))).toString(16).padStart(2,'0')).join('');
+  }
+  function colorForFraction(t){
+    const full = hexToRgb(baseColor);
+    const empty = [250, 248, 253];
+    const k = Math.max(0, Math.min(1, t));
+    return rgbToHex(
+      empty[0] + (full[0]-empty[0])*k,
+      empty[1] + (full[1]-empty[1])*k,
+      empty[2] + (full[2]-empty[2])*k
+    );
+  }
+
+  function currentC(){ return steps.length ? steps[steps.length-1].Cafter : C0; }
+
+  function flaskSVG(colorHex, fillPct, size){
+    const w = size, h = size * 1.5;
+    const liquidH = Math.max(h*0.08, h*0.6*fillPct);
+    const uid = colorHex.replace('#','') + Math.round(fillPct*1000) + size;
+    return `
+    <svg width="${w}" height="${h+8}" viewBox="0 0 ${w} ${h+8}">
+      <path d="M${w*0.38} 6 L${w*0.38} ${h*0.36} L${w*0.14} ${h*0.84} Q${w*0.1} ${h*0.94} ${w*0.26} ${h*0.94} L${w*0.74} ${h*0.94} Q${w*0.9} ${h*0.94} ${w*0.86} ${h*0.84} L${w*0.62} ${h*0.36} L${w*0.62} 6"
+            fill="#F7FBFF" stroke="#DCEBF7" stroke-width="2.5"/>
+      <clipPath id="clip-${uid}">
+        <path d="M${w*0.38} 6 L${w*0.38} ${h*0.36} L${w*0.14} ${h*0.84} Q${w*0.1} ${h*0.94} ${w*0.26} ${h*0.94} L${w*0.74} ${h*0.94} Q${w*0.9} ${h*0.94} ${w*0.86} ${h*0.84} L${w*0.62} ${h*0.36} L${w*0.62} 6" />
+      </clipPath>
+      <rect x="0" y="${h-liquidH}" width="${w}" height="${liquidH}" fill="${colorHex}"
+            clip-path="url(#clip-${uid})"/>
+      <circle cx="${w*0.3}" cy="${h*0.7}" r="${w*0.04}" fill="#fff" opacity="0.5" clip-path="url(#clip-${uid})"/>
+      <circle cx="${w*0.65}" cy="${h*0.6}" r="${w*0.03}" fill="#fff" opacity="0.4" clip-path="url(#clip-${uid})"/>
+      <line x1="${w*0.38}" y1="6" x2="${w*0.62}" y2="6" stroke="#DCEBF7" stroke-width="4" stroke-linecap="round"/>
+    </svg>`;
+  }
+
+  function renderSetup(){
+    root.innerHTML = `
+      <div class="container">
+        <div class="header">
+          <span class="emoji">🧪</span>
+          <h1>Diluição em Série</h1>
+          <p>C₁ · V₁ = C₂ · V₂</p>
+        </div>
+        <div class="card">
+          <div class="step-badge">Passo 1 · Preparar a solução</div>
+          <div class="setup-row">
+            <div class="field">
+              <label>Concentração inicial</label>
+              <input id="inC0" type="number" min="1" step="1" value="${C0}" />
+              <div class="hint">ex: 100 = 100% de suco/corante</div>
+            </div>
+            <div class="field">
+              <label>Cor da mistura</label>
+              <input id="inColor" type="color" value="${baseColor}" />
+              <div class="hint">a cor mais forte, no começo</div>
+            </div>
+          </div>
+          <button class="btn btn-primary" id="btnStart">Começar experimento</button>
+        </div>
+      </div>
+    `;
+    document.getElementById('btnStart').addEventListener('click', () => {
+      const c0 = parseFloat(document.getElementById('inC0').value);
+      const color = document.getElementById('inColor').value;
+      if (!c0 || c0 <= 0) return;
+      C0 = c0;
+      baseColor = color;
+      steps = [];
+      renderMain();
+    });
+  }
+
+  function renderMain(){
+    const cur = currentC();
+    const frac = cur / C0;
+
+    const historyItems = [
+      { label: 'Início', val: C0, frac: 1 },
+      ...steps.map((s,i) => ({ label: `Etapa ${i+1}`, val: s.Cafter, frac: s.Cafter / C0 }))
+    ];
+
+    const historyHTML = historyItems.map((h, i) => `
+      <div class="history-item ${i === historyItems.length-1 ? 'active' : ''}">
+        ${flaskSVG(colorForFraction(h.frac), Math.max(0.1, h.frac), 36)}
+        <div class="num">${h.label}</div>
+        <div class="val">${h.val < 1 ? h.val.toFixed(3) : h.val.toFixed(1)}</div>
+      </div>
+    `).join('');
+
+    root.innerHTML = `
+      <div class="container">
+        <div class="header">
+          <span class="emoji">🧪</span>
+          <h1>Diluição em Série</h1>
+          <p>C₁ · V₁ = C₂ · V₂</p>
+        </div>
+
+        <div class="top-actions">
+          <button class="btn-ghost" id="btnRestart">↺ Recomeçar</button>
+        </div>
+
+        <div class="card">
+          <div class="stage-main">
+            ${flaskSVG(colorForFraction(frac), Math.max(0.1, frac), 100)}
+            <div class="conc-display">
+              <div class="value">${cur < 1 ? cur.toFixed(3) : cur.toFixed(2)}</div>
+              <div class="label">concentração atual</div>
+            </div>
+          </div>
+
+          <div class="dilute-controls">
+            <div class="step-badge">Passo ${steps.length + 2} · Fazer diluição</div>
+            <div class="setup-row">
+              <div class="field">
+                <label>Retirar (V₁, mL)</label>
+                <input id="inV1" type="number" min="0" step="0.1" value="50" />
+              </div>
+              <div class="field">
+                <label>Completar até (V₂, mL)</label>
+                <input id="inV2" type="number" min="0" step="0.1" value="100" />
+              </div>
+            </div>
+            <div class="calc-line" id="calcLine"></div>
+            <button class="btn btn-primary" id="btnDiluir">Diluir agora</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="history-title">Histórico das diluições</div>
+          ${steps.length === 0
+            ? `<div class="empty">Ainda não há diluições — faça a primeira acima e ela aparece aqui.</div>`
+            : `<div class="history-strip">${historyHTML}</div>`
+          }
+        </div>
+      </div>
+    `;
+
+    updateCalc();
+    document.getElementById('inV1').addEventListener('input', updateCalc);
+    document.getElementById('inV2').addEventListener('input', updateCalc);
+    document.getElementById('btnDiluir').addEventListener('click', doDilute);
+    document.getElementById('btnRestart').addEventListener('click', renderSetup);
+  }
+
+  function updateCalc(){
+    const line = document.getElementById('calcLine');
+    if (!line) return;
+    const v1 = parseFloat(document.getElementById('inV1').value) || 0;
+    const v2 = parseFloat(document.getElementById('inV2').value) || 0;
+    const c1 = currentC();
+    if (v1 <= 0 || v2 <= 0 || v1 > v2) {
+      line.innerHTML = v1 > v2
+        ? `V₁ não pode ser maior que V₂.`
+        : `Preencha V₁ e V₂ para ver a concentração prevista.`;
+      return;
+    }
+    const c2 = (c1 * v1) / v2;
+    line.innerHTML = `<b>${c1.toFixed(2)}</b> × <b>${v1}</b> = C₂ × <b>${v2}</b> &nbsp;→&nbsp; nova concentração: <span class="eq">${c2.toFixed(4)}</span>`;
+  }
+
+  function doDilute(){
+    const v1 = parseFloat(document.getElementById('inV1').value);
+    const v2 = parseFloat(document.getElementById('inV2').value);
+    if (!v1 || !v2 || v2 <= 0 || v1 > v2) return;
+    const cBefore = currentC();
+    const cAfter = (cBefore * v1) / v2;
+    steps.push({ V1: v1, V2: v2, Cbefore: cBefore, Cafter: cAfter });
+    renderMain();
+  }
+
+  renderSetup();
+})();
+</script>
