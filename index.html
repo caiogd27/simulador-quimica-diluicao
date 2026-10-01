@@ -1,0 +1,2049 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Diluição seriada — laboratório virtual</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400;1,9..144,600&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0B1220;--p1:#121B30;--p2:#182140;--line:#28375C;--line2:#3A4C78;
+  --text:#E6ECF7;--txt:#E6ECF7;--muted:#93A3C0;--dim:#6B7A99;
+  --teal:#4FD1C5;--amber:#F2A65A;--violet:#C9A6F5;--sky:#7DD3FC;--yellow:#FBE38A;
+  --coral:#F0708A;--pink:#F0708A;--peach:#FF9E7A;--green:#6FCF97;
+  --panel:#121B30;--panel-2:#182140;
+  --serif:"Fraunces",Georgia,"Times New Roman",serif;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;padding:0}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px);background:#0B1220}
+body{
+  background:radial-gradient(1100px 520px at 50% -140px,#1B2849 0%,rgba(11,18,32,0) 72%),var(--bg);
+  background-color:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.5;min-height:100vh;
+  -webkit-text-size-adjust:100%;
+}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--teal);outline-offset:2px;border-radius:6px}
+.wrap{max-width:1240px;margin:0 auto;padding:26px 20px 60px}
+.mono{font-family:var(--mono)}
+.nowrap{white-space:nowrap}
+.oculto{display:none!important}
+.pular{position:absolute;left:-9999px}
+.pular:focus{position:static;display:inline-block;margin-bottom:8px;color:var(--yellow)}
+
+/* ---------- HERO ---------- */
+.hero{position:relative;padding:14px 0 18px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);display:flex;align-items:center;gap:10px;margin:0}
+.eyebrow::before{content:"";width:36px;border-top:1px dashed var(--teal)}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(34px,5.4vw,58px);line-height:1.04;margin:12px 0 10px;letter-spacing:-.01em}
+h1 em{font-style:italic;font-weight:400;color:var(--teal)}
+.sub{color:var(--muted);max-width:620px;margin:0 0 14px;font-size:16px}
+.fline{font-family:var(--mono);font-size:14px;display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;color:var(--muted)}
+.fline b{font-weight:600;color:var(--text);font-size:16px;padding:4px 10px;border:1px solid var(--line);border-radius:8px;background:rgba(18,27,48,.7)}
+.how{position:absolute;top:16px;right:0}
+
+/* ---------- ABAS ---------- */
+.tabs{display:flex;gap:6px;overflow-x:auto;padding:6px;background:rgba(18,27,48,.8);border:1px solid var(--line);border-radius:16px;margin:10px 0 22px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:1 0 auto;position:relative;background:transparent;border:0;color:var(--muted);padding:9px 16px 13px;border-radius:12px;cursor:pointer;text-align:left;min-width:128px;min-height:52px;transition:background .15s,color .15s}
+.tab .cod{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;color:var(--dim)}
+.tab .nm{font-weight:600;font-size:14px;white-space:nowrap}
+.tab:hover{color:var(--text);background:rgba(255,255,255,.03)}
+.tab[aria-selected="true"]{background:var(--p2);color:var(--text);box-shadow:0 0 0 1px var(--line),0 0 26px rgba(79,209,197,.08)}
+.tab[aria-selected="true"] .cod{color:var(--teal)}
+.tab::after{content:"";position:absolute;left:14px;right:14px;bottom:5px;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--teal),var(--sky));opacity:0;transform:scaleX(.3);transform-origin:left;transition:.25s}
+.tab[aria-selected="true"]::after{opacity:1;transform:none}
+
+.panel{display:none}
+.panel.ativo{display:block;animation:entra .3s ease}
+
+/* ---------- LAYOUT E CARDS ---------- */
+.grid2{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,1fr);gap:18px;align-items:start}
+.grid{display:grid;grid-template-columns:minmax(0,1.02fr) minmax(0,.98fr);gap:18px;align-items:start}
+.col{display:flex;flex-direction:column;gap:18px;min-width:0}
+.card{background:linear-gradient(180deg,var(--p2),var(--p1));border:1px solid var(--line);border-radius:16px;padding:18px;min-width:0}
+.card h2{font-family:var(--serif);font-weight:600;font-size:22px;margin:0 0 4px;line-height:1.2}
+.card h2 em{font-style:italic;font-weight:400;color:var(--violet)}
+.card h3{font-family:var(--serif);font-size:17px;font-weight:600;margin:0 0 6px}
+.card p{margin:0 0 10px;color:#CBD6EC}
+.card p:last-child{margin-bottom:0}
+.lead,.card .lead{color:var(--muted);margin:0 0 14px;font-size:14.5px;max-width:68ch}
+h2.secao{font-family:var(--serif);font-size:clamp(24px,4vw,30px);font-weight:600;margin:2px 0 6px}
+.rotulo,.plabel,.card .rotulo,.card .plabel{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:14px 0 6px}
+.plabel:first-child,.rotulo:first-child{margin-top:0}
+.nota,.card .nota{font-size:12.5px;color:var(--dim);margin:10px 2px 0;line-height:1.45}
+.hint{font-size:13px;color:var(--muted);margin-top:10px;border-left:2px solid var(--teal);padding-left:10px}
+
+/* ---------- BOTÕES (interativos) ---------- */
+.btn{--c:79,209,197;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  background:rgba(var(--c),.1);border:1px solid rgba(var(--c),.5);color:rgb(var(--c));
+  border-radius:10px;padding:9px 14px;min-height:44px;cursor:pointer;font-weight:600;font-size:14px;line-height:1.25;text-align:center;
+  transition:border-color .15s,box-shadow .15s,background .15s,transform .1s,opacity .2s;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+.btn:hover:not(:disabled){background:rgba(var(--c),.18);box-shadow:0 0 18px rgba(var(--c),.22)}
+.btn:active:not(:disabled){transform:translateY(1px)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.c-sky{--c:125,211,252}.btn.c-amber{--c:242,166,90}.btn.c-violet{--c:201,166,245}.btn.c-green{--c:111,207,151}
+.btn.ghost{background:transparent;border-color:var(--line);color:var(--muted);font-weight:500}
+.btn.ghost:hover:not(:disabled){color:var(--text);border-color:var(--line2);background:rgba(255,255,255,.03);box-shadow:0 0 16px rgba(125,211,252,.08)}
+.btn.act{min-height:52px;font-size:16px;padding:12px 18px;border-radius:12px;flex:1 1 220px}
+.btn.act:not(:disabled){animation:chama 2.6s ease-in-out infinite}
+@keyframes chama{0%,100%{box-shadow:0 0 0 0 rgba(var(--c),0)}50%{box-shadow:0 0 0 5px rgba(var(--c),.1)}}
+.cta{margin-top:14px}
+
+/* ---------- LEGENDA: interativo x calculado ---------- */
+.ilegend{display:flex;flex-wrap:wrap;gap:8px 18px;font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.ilegend span{display:inline-flex;align-items:center;gap:7px}
+.ilegend i{width:18px;height:12px;border-radius:4px;display:inline-block}
+.ilegend .k-in{border:1px solid var(--teal);background:rgba(79,209,197,.12);box-shadow:0 0 8px rgba(79,209,197,.35)}
+.ilegend .k-out{border:1px dashed var(--line2)}
+
+/* ---------- CONTROLES DESLIZANTES (interativos) ---------- */
+.slider{padding:8px 12px 2px;border:1px solid rgba(79,209,197,.45);border-radius:12px;background:#0F1A2E;transition:border-color .15s,box-shadow .15s}
+.slider:hover{border-color:var(--teal);box-shadow:0 0 14px rgba(79,209,197,.14)}
+.slider:focus-within{border-color:var(--teal);box-shadow:0 0 0 3px rgba(79,209,197,.2)}
+.slider + .slider{margin-top:8px}
+.slider label{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.slider label::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--teal);box-shadow:0 0 6px var(--teal);flex:0 0 auto;align-self:center;margin-right:-2px}
+.slider label .v{margin-left:auto;font-size:15px;font-weight:600;color:var(--yellow);letter-spacing:0;text-transform:none}
+input[type=range]{width:100%;height:34px;margin:0;accent-color:var(--teal);cursor:pointer}
+input[type=range]:disabled{opacity:.45;cursor:not-allowed}
+#bloco-preparo .slider:first-child input{accent-color:var(--amber)}
+#bloco-preparo .slider:first-child label::before{background:var(--amber);box-shadow:0 0 6px var(--amber)}
+#bloco-final input,#cmp-vol{accent-color:var(--sky)}
+#bloco-final label::before{background:var(--sky);box-shadow:0 0 6px var(--sky)}
+
+/* ---------- ETAPAS (pílulas, como no conceito.html) ---------- */
+.steps{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px;padding:0;list-style:none}
+.step{--c:var(--teal);font-family:var(--mono);font-size:11.5px;padding:5px 10px;border-radius:999px;border:1px solid var(--line);color:var(--dim);display:inline-flex;align-items:center;gap:6px;transition:color .25s,border-color .25s,box-shadow .25s}
+.step .dot{font-style:normal;opacity:.85}
+.step.feita{color:var(--green);border-color:rgba(111,207,151,.4)}
+.step.atual{color:var(--c);border-color:var(--c);box-shadow:0 0 14px rgba(79,209,197,.18)}
+.step.atual .dot{animation:respira 1.6s ease-in-out infinite}
+@keyframes respira{0%,100%{opacity:.6}50%{opacity:1}}
+
+/* ---------- BANCADA ---------- */
+.bancada{position:relative;border-radius:12px;background:radial-gradient(ellipse at 50% 100%,rgba(79,209,197,.06),transparent 60%),#0E1628;border:1px solid rgba(40,55,92,.7);padding:6px}
+svg.cena{display:block;width:100%;height:auto}
+
+/* ---------- ÁREA DE CONTROLE DO LABORATÓRIO ---------- */
+.ctrls{margin-top:14px;display:grid;gap:10px}
+.divider{border-top:1px dashed var(--line);margin:2px 0}
+.acoes{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch}
+.acoes .btn.ghost{flex:0 0 auto;min-height:52px}
+.status{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);background:rgba(11,18,32,.55);border-radius:12px;padding:10px 13px;font-size:14.5px;transition:border-color .3s,background .3s}
+.status .tag{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--sky);flex:0 0 auto;padding-top:2px}
+.status.ok{border-color:rgba(111,207,151,.45);background:rgba(111,207,151,.06)}.status.ok .tag{color:var(--green)}
+.status.erro{border-color:rgba(255,158,122,.5);background:rgba(255,158,122,.06)}.status.erro .tag{color:var(--peach)}
+.feito{margin:0;min-height:20px;font-family:var(--mono);font-size:13px;color:var(--green)}
+.feito.anima{animation:entra .5s ease}
+
+/* ---------- PAINEL DE LEITURA (calculado) ---------- */
+.readouts{display:grid;gap:8px}
+.ro{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:10px 12px;border-radius:10px;background:rgba(11,18,32,.55);border:1px dashed var(--line2)}
+.ro .k{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.ro .v{font-family:var(--mono);font-size:20px;font-weight:600;white-space:nowrap}
+.ro.mass .v{color:var(--amber)} .ro.vol .v{color:var(--sky)} .ro.conc .v{color:var(--teal);font-size:24px}
+.ro.conc{border-color:rgba(79,209,197,.35);box-shadow:0 0 22px rgba(79,209,197,.07)}
+.onde,.card .onde{font-family:var(--mono);font-size:11px;color:var(--dim);margin:0 0 6px}
+.formula{border:1px dashed var(--line);border-radius:12px;padding:12px 14px;font-family:var(--mono)}
+.formula .big{font-size:20px;font-weight:600;color:var(--yellow);margin:0 0 6px}
+.eqviva{font-family:var(--mono);font-size:13.5px;color:var(--text);margin:0;overflow-x:auto;white-space:nowrap}
+.medidor{margin-top:12px}
+.medidor .escala{height:12px;border:1px solid var(--line);border-radius:99px;background:#0E1728;overflow:hidden;background-image:repeating-linear-gradient(90deg,#1E2B49 0 1px,transparent 1px 10%)}
+.medidor .escala i{display:block;height:100%;width:0;border-radius:99px;transition:width .5s ease,background .5s ease}
+.medidor .pes{display:flex;justify-content:space-between;gap:8px;font-family:var(--mono);font-size:10px;color:var(--dim);margin-top:5px}
+.calc{font-family:var(--mono);font-size:14.5px;line-height:1.85;display:grid;gap:6px}
+.calc .l{display:block;white-space:nowrap;overflow-x:auto;padding:6px 12px;border-radius:10px;border:1px solid var(--line);background:rgba(11,18,32,.5)}
+.calc .l.solta{white-space:normal;line-height:1.45;font-size:13px;border-style:dashed}
+.calc .fade{color:var(--dim)}
+.calc .res{color:var(--teal);font-size:18px;font-weight:600;border-color:rgba(79,209,197,.5);box-shadow:0 0 18px rgba(79,209,197,.1)}
+.calc .amb{color:var(--amber)}
+table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12.5px;min-width:340px}
+.tabela-wrap{overflow-x:auto}
+th,td{padding:7px 9px;text-align:left;border-bottom:1px solid #1E2B49;white-space:nowrap}
+th{color:var(--muted);font-weight:500;font-size:10px;letter-spacing:.1em;text-transform:uppercase}
+tr:last-child td{border-bottom:none}
+td.c2{color:var(--teal)}
+.vazio,.card .vazio{color:var(--dim);font-size:13px;margin:2px 0 0}
+
+/* série de diluições */
+.serie{display:flex;align-items:flex-end;overflow-x:auto;padding:4px 2px 12px;margin-bottom:6px}
+.chip{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:66px;position:relative;padding:0 8px}
+.chip + .chip:before{content:"›";position:absolute;left:-4px;top:12px;color:var(--dim);font-family:var(--mono)}
+.chip b{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--muted)}
+.chip span{font-family:var(--mono);font-size:12px;color:var(--teal);white-space:nowrap}
+.chip.novo{animation:entra .6s ease}
+.tubo{display:block;width:24px;height:40px;border:1.5px solid rgba(220,232,250,.5);border-top:none;border-radius:0 0 11px 11px;
+  background:linear-gradient(to top,var(--fill,#4FD1C5) 0 72%,rgba(125,211,252,.04) 72%)}
+
+/* ---------- CONCEITOS ---------- */
+.passos{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.passo{display:grid;grid-template-columns:30px 1fr;gap:12px;background:rgba(11,18,32,.45);border:1px solid var(--line);border-left:3px solid var(--c,var(--teal));border-radius:12px;padding:11px 13px}
+.passo .pn{font-family:var(--mono);width:28px;height:28px;border-radius:50%;border:1.5px solid var(--c,var(--teal));color:var(--c,var(--teal));display:grid;place-items:center;font-size:13px;font-weight:600}
+.passo h3{font-family:var(--serif);font-size:16.5px;font-weight:600;margin:1px 0 4px;color:var(--text)}
+.passo p{margin:0 0 6px;font-size:14px;color:#DDE5F5}
+.passo .lb{font-size:13px;color:#9FB0CF;line-height:1.5}
+.passo .lb b{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--c,var(--teal));margin-right:6px;font-weight:500}
+.fluxo{display:flex;flex-direction:column;margin-top:10px}
+.nivel{display:flex;align-items:center;gap:14px;background:rgba(11,18,32,.45);border:1px solid var(--line);border-radius:12px;padding:8px 14px}
+.nivel .tubo{flex:0 0 auto;height:34px}
+.nivel b{display:block;font-family:var(--mono);font-size:11.5px;font-weight:500;color:var(--muted);letter-spacing:.04em}
+.nivel span{font-family:var(--mono);font-size:15px;color:var(--teal)}
+.seta{font-family:var(--mono);font-size:11.5px;color:var(--dim);padding:5px 0 5px 16px;margin-left:24px;border-left:2px dashed var(--line2)}
+.simbolos{list-style:none;margin:0 0 8px;padding:0}
+.simbolos li{font-family:var(--mono);font-size:13px;color:#B9C6E0;padding:2px 0}
+.simbolos b{color:var(--yellow);font-weight:500;display:inline-block;min-width:2.4em}
+.formula .ex{font-family:var(--sans);font-size:14px;color:var(--muted);margin:0;line-height:1.55}
+.somatorio{font-family:var(--mono);font-size:14.5px;color:#DDE5F5;margin:12px 0;line-height:1.75}
+.somatorio .op{color:var(--dim);display:inline-block;width:1.1em}
+.somatorio .total{color:var(--teal);border-top:1px dashed var(--line);margin-top:6px;padding-top:6px;display:block}
+.veredito{font-family:var(--mono);font-size:13px;color:var(--amber);margin-top:8px}
+#painel-t1 .slider{padding:10px 14px 8px}
+#painel-t1 .card .veredito{margin:14px 2px 0;padding:10px 12px;border:1px dashed var(--line);border-radius:10px;line-height:1.55}
+#painel-t1 .veredito + .nota{margin-top:12px}
+.cmp-cena{padding:10px;margin-top:8px}
+
+/* ---------- QUIZ (uma pergunta por vez) ---------- */
+.quiz{max-width:760px}
+.qprog{font-family:var(--mono);font-size:12px;color:var(--muted);display:flex;justify-content:space-between;gap:10px}
+.qprog b{color:var(--teal);font-weight:600}
+.qbar{height:4px;background:var(--bg);border-radius:4px;margin:8px 0 16px;overflow:hidden}
+.qbar i{display:block;height:100%;background:linear-gradient(90deg,var(--teal),var(--sky));transition:width .35s}
+.qcorpo.entra{animation:desliza .35s ease}
+@keyframes desliza{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
+.qtext{font-family:var(--serif);font-size:21px;line-height:1.35;margin:0 0 14px;outline:none}
+.mini{margin:0 0 14px;background:rgba(11,18,32,.5);border:1px solid var(--line);border-radius:10px;padding:8px}
+.mini svg{display:block;width:100%;height:auto;max-width:420px;margin:0 auto}
+.opts{display:grid;gap:8px}
+.opt{text-align:left;background:rgba(11,18,32,.5);border:1px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;font-size:15px;display:flex;gap:12px;align-items:flex-start;min-height:50px;
+  transition:border-color .15s,background .15s,box-shadow .15s,transform .12s;-webkit-tap-highlight-color:transparent}
+.opt .radio{flex:0 0 auto;width:18px;height:18px;border-radius:50%;border:2px solid var(--line2);margin-top:2px;position:relative;transition:border-color .15s}
+.opt .radio::after{content:"";position:absolute;inset:3px;border-radius:50%;background:var(--teal);transform:scale(0);transition:transform .15s}
+.opt b{font-family:var(--mono);color:var(--muted);font-weight:500;flex:0 0 auto}
+.opt:hover:not(:disabled){border-color:rgba(79,209,197,.55);background:rgba(79,209,197,.05)}
+.opt.sel{border-color:var(--teal);background:rgba(79,209,197,.1);box-shadow:0 0 16px rgba(79,209,197,.12);animation:toque .18s ease}
+.opt.sel .radio{border-color:var(--teal)}
+.opt.sel .radio::after{transform:scale(1)}
+@keyframes toque{50%{transform:scale(.985)}}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--green);background:rgba(111,207,151,.1);animation:acerto .5s ease}
+.opt.right .radio{border-color:var(--green)}.opt.right .radio::after{background:var(--green);transform:scale(1)}
+.opt.wrong{border-color:var(--coral);background:rgba(240,112,138,.1);animation:erro .35s ease}
+.opt.wrong .radio{border-color:var(--coral)}.opt.wrong .radio::after{background:var(--coral);transform:scale(1)}
+.opt.apaga{opacity:.55}
+@keyframes acerto{40%{box-shadow:0 0 0 4px rgba(111,207,151,.25)}}
+@keyframes erro{20%{transform:translateX(-4px)}40%{transform:translateX(4px)}60%{transform:translateX(-3px)}80%{transform:translateX(2px)}}
+.qfb{margin-top:12px;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:rgba(11,18,32,.45);font-size:14.5px;animation:entra .3s ease}
+.qfb .st{display:block;font-weight:600;font-size:16px;margin-bottom:4px}
+.qfb.ok{border-color:rgba(111,207,151,.45)}.qfb.ok .st{color:var(--green)}
+.qfb.no{border-color:rgba(240,112,138,.45)}.qfb.no .st{color:var(--coral)}
+.qfb .cl{display:block;font-family:var(--mono);font-size:13px;color:var(--yellow);margin:4px 0;overflow-wrap:anywhere}
+.qacoes{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.qacoes .btn{min-height:50px;min-width:190px;font-size:15px}
+.qend{text-align:center;padding:14px 0 6px;animation:entra .4s ease}
+.qend h3{font-family:var(--serif);font-size:24px;font-weight:600;margin:0 0 10px}
+.qend .big{font-family:var(--serif);font-size:58px;color:var(--teal);line-height:1}
+.qend .big small{font-size:26px;color:var(--muted)}
+.qend .rotulo{margin:6px 0 10px}
+.qend p{max-width:46ch;margin:10px auto 16px;color:var(--muted)}
+.qend .plabel,.qend .rotulo{max-width:none;margin-left:0;margin-right:0}
+.qend .qacoes .btn{flex:0 1 280px}
+.resumo{display:flex;justify-content:center;gap:5px;flex-wrap:wrap;margin:14px 0 4px}
+.resumo i{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font-style:normal;font-family:var(--mono);font-size:11px;border:1px solid var(--line)}
+.resumo i.ok{color:var(--green);border-color:rgba(111,207,151,.45);background:rgba(111,207,151,.08)}
+.resumo i.no{color:var(--coral);border-color:rgba(240,112,138,.45);background:rgba(240,112,138,.08)}
+
+/* ---------- MODAL ---------- */
+.overlay{position:fixed;inset:0;background:rgba(5,9,18,.75);z-index:60;display:flex;justify-content:center;align-items:flex-start;padding:22px 14px;overflow-y:auto}
+.modal{background:linear-gradient(180deg,var(--p2),var(--p1));border:1px solid var(--line);border-radius:16px;width:100%;max-width:460px;padding:20px 22px;margin:auto;box-shadow:0 0 60px rgba(79,209,197,.08)}
+.modal h2{font-family:var(--serif);font-size:24px;margin:0 0 10px}
+.modal ol{margin:0 0 16px;padding-left:22px;display:grid;gap:5px;color:#CBD6EC}
+.modal li::marker{font-family:var(--mono);color:var(--teal)}
+.modal .formula{margin-bottom:16px}
+
+footer{margin-top:30px;border-top:1px solid var(--line);padding-top:14px;color:var(--dim);font-size:12px;font-family:var(--mono)}
+
+/* ---------- ANIMAÇÕES DO LABORATÓRIO ---------- */
+@keyframes entra{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.anima-entra{animation:entra .6s ease}
+.jato{opacity:0}
+.jato.on{opacity:1;animation:fluir .5s linear infinite}
+@keyframes fluir{to{stroke-dashoffset:-22}}
+#pipeta{transition:transform .75s cubic-bezier(.5,.05,.3,1)}
+.onda{fill:none;stroke:#BFE6F5;stroke-width:1.8;opacity:0;transform-box:fill-box;transform-origin:center}
+.onda.on{animation:onda 1s ease-out infinite}
+.onda.on.b{animation-delay:.5s}
+@keyframes onda{0%{transform:scale(.25);opacity:.9}100%{transform:scale(1.6);opacity:0}}
+#bastao{opacity:0;transition:opacity .3s;transform-origin:445px 70px}
+#bastao.on{opacity:1;animation:agitar .95s ease-in-out infinite}
+@keyframes agitar{0%,100%{transform:rotate(-11deg)}50%{transform:rotate(11deg)}}
+#grupo-dil.mexendo{animation:mexer 1s ease-in-out infinite;transform-origin:445px 300px}
+@keyframes mexer{0%,100%{transform:rotate(0)}25%{transform:rotate(-.8deg)}75%{transform:rotate(.8deg)}}
+#contorno-dil{transition:stroke .4s}
+#contorno-dil.ok{stroke:#6FCF97}
+#lbl-dil-c{transform-box:fill-box;transform-origin:center}
+#ld-c{display:inline-block;transform-origin:right center}
+.pulsar{animation:pulso .9s ease}
+@keyframes pulso{0%{transform:scale(1)}30%{transform:scale(1.13)}100%{transform:scale(1)}}
+
+/* ---------- RESPONSIVO ---------- */
+@media (max-width:1040px){
+  .grid{grid-template-columns:1fr}
+}
+@media (max-width:900px){
+  .grid2{grid-template-columns:1fr}
+  .how{position:static;margin-top:14px}
+}
+@media (max-width:560px){
+  .wrap{padding:18px 12px 40px}
+  .card{padding:14px}
+  .tab{min-width:104px;padding:8px 12px 12px}
+  .btn.act{flex-basis:100%}
+  .acoes .btn.ghost{flex:1 1 100%;min-height:46px}
+  .qtext{font-size:19px}
+  .qacoes .btn{flex:1 1 100%}
+  .passo{grid-template-columns:26px 1fr;gap:10px;padding:10px 11px}
+  .ro .v{font-size:18px}.ro.conc .v{font-size:21px}
+}
+@media (pointer:coarse){
+  input[type=range]{height:44px}
+  .opt{min-height:54px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+  <radialGradient id="gParticula" cx="38%" cy="34%" r="70%">
+    <stop offset="0" stop-color="#CFE9FF"/><stop offset=".4" stop-color="#2463B8"/><stop offset="1" stop-color="#0A2452"/>
+  </radialGradient>
+</defs></svg>
+<div class="wrap">
+<a class="pular" href="#conteudo">Pular para o conteúdo</a>
+
+<header class="hero">
+  <p class="eyebrow">Química · Soluções</p>
+  <h1>Diluição <em>seriada</em></h1>
+  <p class="sub">Retire uma amostra, complete com água e misture. O soluto é o mesmo, o volume é maior: a concentração cai. Repita e veja a série se formar.</p>
+  <div class="fline"><b>C₁ · V₁ = C₂ · V₂</b><span>concentração × volume retirado = concentração × volume final</span></div>
+  <button class="btn ghost how" id="btn-como" type="button">Como usar</button>
+</header>
+
+<div class="overlay" id="overlay-como" hidden role="dialog" aria-modal="true" aria-labelledby="como-titulo">
+  <div class="modal">
+    <h2 id="como-titulo">Como usar</h2>
+    <ol>
+      <li>Na primeira vez, ajuste o soluto e o volume da solução inicial.</li>
+      <li>Escolha quanto retirar e toque em <b>Retirar</b>.</li>
+      <li>Toque em <b>Transferir</b> para levar a amostra ao béquer de diluição.</li>
+      <li>Escolha o volume final e toque em <b>Adicionar água</b>.</li>
+      <li>Toque em <b>Misturar</b>.</li>
+      <li>Leia a nova concentração e o cálculo.</li>
+      <li>Toque em <b>Diluir de novo</b> para continuar a série.</li>
+    </ol>
+    <div class="formula">
+      <p class="big">C₁ · V₁ = C₂ · V₂</p>
+      <p class="ex">A massa de soluto da amostra é a mesma antes e depois de juntar a água. Daí sai essa relação.</p>
+    </div>
+    <button class="btn" id="btn-fechar-como" type="button">Entendi</button>
+  </div>
+</div>
+
+<nav class="tabs" role="tablist" aria-label="Seções">
+  <button class="tab" role="tab" id="tab-t1" aria-controls="painel-t1" aria-selected="false" tabindex="-1" data-tab="t1"><span class="cod">01</span><span class="nm">Conceitos</span></button>
+  <button class="tab" role="tab" id="tab-t2" aria-controls="painel-t2" aria-selected="true" tabindex="0" data-tab="t2"><span class="cod">02</span><span class="nm">Laboratório</span></button>
+  <button class="tab" role="tab" id="tab-t3" aria-controls="painel-t3" aria-selected="false" tabindex="-1" data-tab="t3"><span class="cod">03</span><span class="nm">Quiz</span></button>
+</nav>
+
+<main id="conteudo">
+
+<!-- ================= 01 CONCEITOS ================= -->
+<section class="panel" id="painel-t1" role="tabpanel" aria-labelledby="tab-t1" tabindex="0">
+  <h2 class="secao">Entenda o experimento</h2>
+  <p class="lead">O que você lê aqui é exatamente o que acontece no laboratório. Leia, depois faça.</p>
+  <div class="grid conceitos">
+    <div class="col">
+
+      <div class="card">
+        <h2>O que é <em>diluir</em>?</h2>
+        <p><b>Diluir</b> é diminuir a concentração de uma solução acrescentando solvente. Aqui, o solvente é a água e o soluto é o corante (ou o suco em pó).</p>
+        <p>A <b>concentração</b> diz quanto soluto há em cada litro de solução. Quanto mais água para o mesmo soluto, menor ela fica.</p>
+      </div>
+
+      <div class="card">
+        <h2>Como funciona o <em>experimento</em></h2>
+        <p class="lead">Cada passo é exatamente o que você faz na aba Laboratório.</p>
+        <ol class="passos">
+          <li class="passo" style="--c:#93A2C0">
+            <span class="pn">1</span>
+            <div>
+              <h3>Solução inicial</h3>
+              <p>Comece com uma solução mais concentrada, como água com corante.</p>
+              <p class="lb"><b>No laboratório</b>O béquer da esquerda começa com 10 g em 100 mL (100 g/L). Na primeira vez, você pode ajustar soluto e volume.</p>
+            </div>
+          </li>
+          <li class="passo" style="--c:var(--teal)">
+            <span class="pn">2</span>
+            <div>
+              <h3>Retirar</h3>
+              <p>Retire 50 mL da solução.</p>
+              <p class="lb"><b>No laboratório</b>A pipeta desce no béquer da esquerda e retira 50 mL: o nível baixa e a pipeta se enche.</p>
+            </div>
+          </li>
+          <li class="passo" style="--c:var(--sky)">
+            <span class="pn">3</span>
+            <div>
+              <h3>Transferir</h3>
+              <p>Passe a amostra para outro recipiente.</p>
+              <p class="lb"><b>No laboratório</b>A pipeta vai até o béquer de diluição e despeja a amostra.</p>
+            </div>
+          </li>
+          <li class="passo" style="--c:var(--amber)">
+            <span class="pn">4</span>
+            <div>
+              <h3>Adicionar água</h3>
+              <p>Complete até 100 mL com água.</p>
+              <p class="lb"><b>No laboratório</b>A água cai da torneira e o nível sobe até a linha tracejada de 100 mL.</p>
+            </div>
+          </li>
+          <li class="passo" style="--c:var(--violet)">
+            <span class="pn">5</span>
+            <div>
+              <h3>Misturar</h3>
+              <p>Misture até a solução ficar uniforme.</p>
+              <p class="lb"><b>No laboratório</b>O bastão gira, os pontos de soluto se espalham e a cor fica igual em todo o béquer.</p>
+            </div>
+          </li>
+          <li class="passo" style="--c:var(--green)">
+            <span class="pn">6</span>
+            <div>
+              <h3>Nova concentração</h3>
+              <p>A solução ficou menos concentrada.</p>
+              <p class="lb"><b>No laboratório</b>A concentração calculada cai de 100 para 50 g/L, a cor clareia e o cálculo C₁ · V₁ = C₂ · V₂ aparece com os seus valores.</p>
+            </div>
+          </li>
+          <li class="passo" style="--c:var(--green)">
+            <span class="pn">7</span>
+            <div>
+              <h3>Repetir</h3>
+              <p>Use a nova solução para fazer outra diluição.</p>
+              <p class="lb"><b>No laboratório</b>O botão <i>Diluir de novo</i> faz a solução obtida virar a nova solução de partida.</p>
+            </div>
+          </li>
+        </ol>
+        <button class="btn cta" type="button" data-ir="t2">Fazer no laboratório</button>
+      </div>
+
+    </div>
+    <div class="col">
+
+      <div class="card">
+        <h2>O que acontece em cada <em>etapa</em></h2>
+        <p>O soluto retirado na amostra fica todo no béquer. Só o volume aumenta, por causa da água. Por isso a solução fica menos concentrada.</p>
+        <div class="bancada cmp-cena">
+          <svg class="cena" viewBox="0 0 400 262" role="img" aria-labelledby="cmp-t">
+            <title id="cmp-t">Amostra de 50 mL antes e depois de completar com água, com o mesmo número de pontos de soluto</title>
+            <clipPath id="clipA"><path d="M42 62 L42 195 Q42 206 54 206 L146 206 Q158 206 158 195 L158 62 Z"/></clipPath>
+            <clipPath id="clipOndaA"><path id="onda-a-clip" d="M30 0 L170 0 L170 230 L30 230 Z"/></clipPath>
+            <g clip-path="url(#clipA)"><g clip-path="url(#clipOndaA)"><rect id="cmp-liq-a" x="42" y="126" width="116" height="80" fill="#4FD1C5"/><rect id="cap-a" x="42" y="126" width="116" height="0" fill="#4FD1C5"/><g id="cmp-part-a"></g></g><path id="sup-a" d="" fill="none" stroke="rgba(200,235,255,.5)" stroke-width="1.5" stroke-linejoin="round"/></g>
+            <path d="M40 56 L40 195 Q40 210 56 210 L144 210 Q160 210 160 195 L160 56" fill="none" stroke="rgba(220,232,250,.55)" stroke-width="2.2"/>
+            <g id="cmp-marcas-a" stroke="rgba(220,232,250,.3)" stroke-width="1.2"></g>
+            <text x="100" y="40" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="#93A3C0">AMOSTRA RETIRADA</text>
+            <text id="cmp-lbl-a" x="100" y="232" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="15" fill="#4FD1C5">100 g/L</text>
+            <text id="cmp-sub-a" x="100" y="250" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="#93A2C0">50 mL · 5 g</text>
+
+            <clipPath id="clipB"><path d="M242 62 L242 195 Q242 206 254 206 L346 206 Q358 206 358 195 L358 62 Z"/></clipPath>
+            <clipPath id="clipOndaB"><path id="onda-b-clip" d="M230 0 L370 0 L370 230 L230 230 Z"/></clipPath>
+            <g clip-path="url(#clipB)"><g clip-path="url(#clipOndaB)"><rect id="cmp-liq-b" x="242" y="126" width="116" height="80" fill="#4FD1C5"/><rect id="cap-b" x="242" y="126" width="116" height="0" fill="#4FD1C5"/><g id="cmp-part-b"></g></g><path id="sup-b" d="" fill="none" stroke="rgba(200,235,255,.5)" stroke-width="1.5" stroke-linejoin="round"/></g>
+            <path d="M240 56 L240 195 Q240 210 256 210 L344 210 Q360 210 360 195 L360 56" fill="none" stroke="rgba(220,232,250,.55)" stroke-width="2.2"/>
+            <g id="cmp-marcas-b" stroke="rgba(220,232,250,.3)" stroke-width="1.2"></g>
+            <text x="300" y="40" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="#93A3C0">DEPOIS DA ÁGUA</text>
+            <text id="cmp-lbl-b" x="300" y="232" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="15" fill="#7DD3FC">50 g/L</text>
+            <text id="cmp-sub-b" x="300" y="250" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11.5" fill="#93A2C0">100 mL · 5 g</text>
+          </svg>
+        </div>
+        <div class="slider" style="margin-top:12px">
+          <label for="cmp-vol">Completar até <span class="v" id="cmp-lbl-vol">100 mL</span></label>
+          <input type="range" id="cmp-vol" min="50" max="200" step="10" value="100">
+        </div>
+        <p class="veredito" id="cmp-veredito"></p>
+        <p class="nota">Os dois béqueres têm os mesmos pontos: o soluto não mudou. A cor e os pontos são representações didáticas, não o número real de partículas.</p>
+      </div>
+
+      <div class="card">
+        <h2>Diluição <em>seriada</em></h2>
+        <p>Quando o processo se repete, cada solução nova passa a ser a solução inicial da etapa seguinte. A concentração cai de forma controlada, etapa por etapa.</p>
+        <div class="fluxo" id="serie-conceito" aria-label="Sequência de diluições"></div>
+        <p class="nota" style="margin-top:10px">Exemplo: a cada etapa, retirar 50 mL e completar até 100 mL divide a concentração por 2.</p>
+      </div>
+
+      <div class="card">
+        <h2>A <em>fórmula</em> usada</h2>
+        <div class="formula">
+          <p class="big">C₁ · V₁ = C₂ · V₂</p>
+          <ul class="simbolos">
+            <li><b>C₁</b> → concentração inicial</li>
+            <li><b>V₁</b> → volume retirado</li>
+            <li><b>C₂</b> → concentração final</li>
+            <li><b>V₂</b> → volume final</li>
+          </ul>
+          <p class="ex"><b>Exemplo:</b> 100&nbsp;g/L · 50&nbsp;mL = C₂ · 100&nbsp;mL<br>C₂ = <span class="nowrap">50 g/L</span></p>
+        </div>
+        <p class="somatorio">
+          50&nbsp;mL de solução
+          <span style="display:block"><span class="op">+</span>50&nbsp;mL de água</span>
+          <span class="total"><span class="op">=</span>100&nbsp;mL de solução diluída</span>
+        </p>
+        <p style="margin:0">Os mesmos 5&nbsp;g de soluto agora estão em 100&nbsp;mL, e não em 50&nbsp;mL. Por isso a concentração caiu de <span class="nowrap">100 g/L</span> para <span class="nowrap">50 g/L</span>.</p>
+        <button class="btn cta" type="button" data-ir="t2">Fazer no laboratório</button>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ================= 02 LABORATÓRIO ================= -->
+<section class="panel ativo" id="painel-t2" role="tabpanel" aria-labelledby="tab-t2" tabindex="0">
+  <div class="grid2">
+    <div class="card">
+      <h2>Bancada de <em>diluição</em></h2>
+      <p class="lead">Retire uma amostra, transfira, complete com água e misture. Depois, dilua de novo a solução obtida.</p>
+      <ol class="steps" id="etapas" aria-label="Etapas da diluição">
+        <li class="step" style="--c:var(--teal)"><i class="dot">1</i><span class="nm">Retirar</span></li>
+        <li class="step" style="--c:var(--sky)"><i class="dot">2</i><span class="nm">Transferir</span></li>
+        <li class="step" style="--c:var(--amber)"><i class="dot">3</i><span class="nm">Adicionar água</span></li>
+        <li class="step" style="--c:var(--violet)"><i class="dot">4</i><span class="nm">Misturar</span></li>
+        <li class="step" style="--c:var(--green)"><i class="dot">5</i><span class="nm">Nova concentração</span></li>
+      </ol>
+      <div class="bancada">
+        <svg class="cena" viewBox="0 0 620 420" role="img" aria-labelledby="cena-t cena-d">
+          <title id="cena-t">Bancada com dois béqueres</title>
+          <desc id="cena-d">À esquerda a solução de partida, à direita o béquer de diluição. Os pontos representam o soluto. Os mesmos valores aparecem em texto ao lado.</desc>
+
+          <!-- reservatório de água -->
+          <g>
+            <rect x="528" y="44" width="66" height="88" rx="12" fill="rgba(125,211,252,.05)" stroke="rgba(220,232,250,.5)" stroke-width="2"/>
+            <rect id="res-agua" x="534" y="86" width="54" height="40" rx="7" fill="#7DD3FC" opacity=".3"/>
+            <rect x="550" y="28" width="22" height="18" rx="4" fill="#2A3A60" stroke="rgba(220,232,250,.45)" stroke-width="1.5"/>
+            <text x="561" y="150" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12" fill="#7DD3FC">ÁGUA</text>
+            <path d="M528 106 L484 106 Q480 106 480 110 L480 140" fill="none" stroke="rgba(220,232,250,.42)" stroke-width="4" stroke-linecap="round"/>
+          </g>
+          <rect x="16" y="343" width="588" height="4" rx="2" fill="#28375C"/><ellipse cx="135" cy="344" rx="72" ry="4" fill="#000" opacity=".22"/><ellipse cx="445" cy="344" rx="72" ry="4" fill="#000" opacity=".22"/>
+
+          <!-- béquer de partida -->
+          <clipPath id="clipFonte"><path d="M72 126 L72 325 Q72 336 86 336 L184 336 Q198 336 198 325 L198 126 Z"/></clipPath>
+          <clipPath id="clipOndaFonte"><path id="onda-fonte-clip" d="M60 0 L210 0 L210 360 L60 360 Z"/></clipPath>
+          <g clip-path="url(#clipFonte)">
+            <g clip-path="url(#clipOndaFonte)">
+            <rect id="liq-fonte" x="72" y="236" width="126" height="100" fill="#3AA8C8"/>
+            <rect id="cap-fonte" x="72" y="236" width="126" height="0" fill="#3AA8C8"/>
+            <g id="part-fonte"></g>
+            </g>
+            <path id="sup-fonte" d="" fill="none" stroke="rgba(200,235,255,.5)" stroke-width="1.5" stroke-linejoin="round"/>
+          </g>
+          <path d="M70 120 L70 325 Q70 340 86 340 L184 340 Q200 340 200 325 L200 120 Z" fill="rgba(180,220,255,.04)"/>
+          <path d="M70 120 L70 325 Q70 340 86 340 L184 340 Q200 340 200 325 L200 120" fill="none" stroke="rgba(220,232,250,.58)" stroke-width="2.5" stroke-linejoin="round"/>
+          <path d="M63 120 L70 120 M200 120 L207 120" stroke="rgba(220,232,250,.58)" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <path d="M80 140 L80 318" stroke="#fff" stroke-opacity=".10" stroke-width="4" stroke-linecap="round" fill="none"/>
+          <g id="marcas-fonte" stroke="rgba(220,232,250,.32)" stroke-width="1.5"></g>
+          <text x="135" y="366" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12.5" fill="#93A3C0" letter-spacing="1">SOLUÇÃO DE PARTIDA</text>
+          <text id="lbl-fonte-c" x="135" y="391" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="21" fill="#4FD1C5">100 g/L</text>
+          <text id="lbl-fonte-v" x="135" y="411" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="14" fill="#93A2C0">100 mL · 10 g</text>
+
+          <!-- béquer de diluição -->
+          <clipPath id="clipDil"><path d="M382 126 L382 325 Q382 336 396 336 L494 336 Q508 336 508 325 L508 126 Z"/></clipPath>
+          <g id="grupo-dil">
+            <clipPath id="clipOndaDil"><path id="onda-dil-clip" d="M370 0 L520 0 L520 360 L370 360 Z"/></clipPath>
+            <g clip-path="url(#clipDil)">
+              <g clip-path="url(#clipOndaDil)">
+              <rect id="liq-dil-sol" x="382" y="336" width="126" height="0" fill="#3AA8C8"/>
+              <rect id="liq-dil-agua" x="382" y="336" width="126" height="0" fill="#9FDFFF" opacity=".26"/>
+              <rect id="cap-dil" x="382" y="336" width="126" height="0" fill="#3AA8C8"/>
+              <g id="part-dil"></g>
+              </g>
+              <path id="agua-onda" d="" fill="#9FDFFF" opacity=".26"/>
+              <path id="agua-brilho" d="" fill="none" stroke="rgba(220,240,255,.6)" stroke-width="1.5" stroke-linejoin="round"/>
+              <path id="agua-brilho2" d="" fill="none" stroke="rgba(220,240,255,.14)" stroke-width="1"/>
+              <path id="sup-dil" d="" fill="none" stroke="rgba(200,235,255,.5)" stroke-width="1.5" stroke-linejoin="round"/>
+            </g>
+            <path d="M380 120 L380 325 Q380 340 396 340 L494 340 Q510 340 510 325 L510 120 Z" fill="rgba(180,220,255,.04)"/>
+            <path id="contorno-dil" d="M380 120 L380 325 Q380 340 396 340 L494 340 Q510 340 510 325 L510 120" fill="none" stroke="rgba(220,232,250,.58)" stroke-width="2.5" stroke-linejoin="round"/>
+            <path d="M373 120 L380 120 M510 120 L517 120" stroke="rgba(220,232,250,.58)" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+            <path d="M390 140 L390 318" stroke="#fff" stroke-opacity=".10" stroke-width="4" stroke-linecap="round" fill="none"/>
+          </g>
+          <g id="marcas-dil" stroke="rgba(220,232,250,.32)" stroke-width="1.5"></g>
+          <g id="alvo" class="oculto">
+            <line id="alvo-linha" x1="376" y1="203" x2="514" y2="203" stroke="#F2A65A" stroke-width="2" stroke-dasharray="6 5"/>
+            <text id="alvo-txt" x="518" y="199" font-family="IBM Plex Mono, monospace" font-size="13" fill="#F2A65A">100 mL</text>
+          </g>
+          <text x="445" y="366" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="12.5" fill="#93A3C0" letter-spacing="1">BÉQUER DE DILUIÇÃO</text>
+          <text id="lbl-dil-c" x="445" y="391" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="21" fill="#7E90B8">—</text>
+          <text id="lbl-dil-v" x="445" y="411" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="14" fill="#93A2C0">vazio</text>
+
+          <!-- jatos e ondas -->
+          <line id="jato-agua" x1="480" y1="142" x2="480" y2="142" stroke="rgba(125,211,252,.6)" stroke-width="4" stroke-linecap="round" opacity="0"/>
+          <line id="jato-agua-luz" x1="479" y1="142" x2="479" y2="142" stroke="rgba(235,248,255,.55)" stroke-width="1.2" stroke-linecap="round" opacity="0"/>
+          <ellipse id="agua-impacto" cx="480" cy="336" rx="8" ry="2.5" fill="none" stroke="rgba(200,235,255,.45)" stroke-width="1.2" opacity="0"/>
+          <line id="jato-sol" class="jato" x1="445" y1="150" x2="445" y2="300" stroke="#4FD1C5" stroke-width="6" stroke-linecap="round" stroke-dasharray="10 12"/>
+          <ellipse id="onda-sol-1" class="onda" cx="445" cy="336" rx="26" ry="5"/>
+          <ellipse id="onda-sol-2" class="onda b" cx="445" cy="336" rx="26" ry="5"/>
+          <ellipse id="onda-agua-1" class="onda" cx="480" cy="336" rx="14" ry="3.5"/>
+          <ellipse id="onda-agua-2" class="onda b" cx="480" cy="336" rx="14" ry="3.5"/>
+
+          <!-- bastão de mistura -->
+          <g id="bastao">
+            <line x1="445" y1="70" x2="445" y2="322" stroke="#93A2C0" stroke-width="5" stroke-linecap="round"/>
+            <line x1="445" y1="70" x2="445" y2="322" stroke="#fff" stroke-opacity=".25" stroke-width="1.5" stroke-linecap="round"/>
+          </g>
+
+          <!-- pipeta -->
+          <g id="pipeta">
+            <rect x="124" y="24" width="22" height="18" rx="6" fill="#2A3A60" stroke="rgba(220,232,250,.5)" stroke-width="1.5"/>
+            <path d="M127 42 L127 132 L135 150 L143 132 L143 42 Z" fill="rgba(14,22,40,.85)" stroke="rgba(220,232,250,.6)" stroke-width="1.8" stroke-linejoin="round"/>
+            <clipPath id="clipPip"><path d="M128 43 L128 131 L135 148 L142 131 L142 43 Z"/></clipPath>
+            <g clip-path="url(#clipPip)"><rect id="pip-liq" x="128" y="148" width="14" height="0" fill="#3AA8C8"/></g>
+          </g>
+        </svg>
+      </div>
+
+      <div class="ctrls">
+        <div class="ilegend"><span><i class="k-in"></i>você pode alterar</span><span><i class="k-out"></i>calculado pelo simulador</span></div>
+        <div class="status" id="status" role="status" aria-live="polite">
+          <span class="tag">AGORA</span><span id="status-txt">Retire uma amostra da solução.</span>
+        </div>
+        <div class="oculto" id="bloco-preparo">
+          <div class="slider">
+            <label for="in-massa">Soluto na solução inicial <span class="v" id="lbl-massa">10 g</span></label>
+            <input type="range" id="in-massa" min="1" max="30" step="1" value="10">
+          </div>
+          <div class="slider">
+            <label for="in-volume">Volume da solução inicial <span class="v" id="lbl-volume">100 mL</span></label>
+            <input type="range" id="in-volume" min="50" max="150" step="10" value="100">
+          </div>
+        </div>
+        <div class="slider oculto" id="bloco-retirar">
+          <label for="in-retirar">Volume a retirar (V₁) <span class="v" id="lbl-retirar">50 mL</span></label>
+          <input type="range" id="in-retirar" min="5" max="100" step="5" value="50">
+        </div>
+        <div class="slider oculto" id="bloco-final">
+          <label for="in-final">Completar até (V₂) <span class="v" id="lbl-final">100 mL</span></label>
+          <input type="range" id="in-final" min="10" max="150" step="5" value="100">
+        </div>
+        <div class="divider"></div>
+        <div class="acoes">
+          <button class="btn act" id="btn-acao" type="button">Retirar 50 mL</button>
+          <button class="btn ghost" id="btn-reset" type="button">Reiniciar</button>
+        </div>
+        <p class="feito" id="feito" role="status" aria-live="polite"></p>
+      </div>
+      <p class="nota">Cada ponto representa uma porção de soluto e a cor acompanha a concentração — representações didáticas. Os números no painel são os valores exatos.</p>
+    </div>
+
+    <aside class="col">
+      <div class="card">
+        <p class="plabel">Medições</p>
+        <p class="onde" id="ld-onde">No béquer de partida</p>
+        <div class="readouts">
+          <div class="ro mass"><span class="k">Massa do soluto</span><span class="v" id="ld-m">10 g</span></div>
+          <div class="ro vol"><span class="k">Volume</span><span class="v" id="ld-v">100 mL</span></div>
+          <div class="ro conc"><span class="k">Concentração</span><span class="v" id="ld-c">100 g/L</span></div>
+        </div>
+        <p class="plabel">Fórmula</p>
+        <div class="formula"><p class="eqviva" id="eq-viva"></p></div>
+        <div class="medidor" aria-hidden="true">
+          <div class="escala"><i id="med-fill"></i></div>
+          <div class="pes"><span>0 g/L</span><span>diluída → concentrada</span><span>100 g/L+</span></div>
+        </div>
+      </div>
+
+      <div class="card oculto" id="card-calculo">
+        <p class="plabel" id="calc-rotulo">O que aconteceu</p>
+        <div class="calc" id="calc-box"></div>
+      </div>
+
+      <div class="card">
+        <p class="plabel">Série de diluições</p>
+        <div class="serie" id="serie" aria-label="Concentração de cada solução da série"></div>
+        <div class="tabela-wrap">
+          <table>
+            <thead><tr><th scope="col">#</th><th scope="col">C₁</th><th scope="col">V₁</th><th scope="col">V₂</th><th scope="col">C₂</th></tr></thead>
+            <tbody id="hist-body"></tbody>
+          </table>
+        </div>
+        <p class="vazio" id="hist-vazio">Ainda sem diluições.</p>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- ================= 03 QUIZ ================= -->
+<section class="panel" id="painel-t3" role="tabpanel" aria-labelledby="tab-t3" tabindex="0">
+  <div class="card quiz" id="quiz" aria-live="polite"></div>
+</section>
+
+</main>
+<footer>Laboratório virtual · diluição seriada · C₁ · V₁ = C₂ · V₂</footer>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ============ geometria da cena ============ */
+var CAP = 150, BOTTOM = 336, HMAX = 200, PIP_BOTTOM = 148, PIP_HMAX = 96;
+var HUE = 200;              /* cor do soluto (corante azul) */
+var C_REF = 100;            /* concentração de referência para a escala de cor, em g/L */
+var X_PIP_DIL = 310;        /* deslocamento da pipeta até o béquer de diluição */
+var ETAPAS = ['RETIRAR','TRANSFERIR','AGUA','MISTURAR','RESULTADO'];
+
+function $(id){ return document.getElementById(id); }
+
+/* ============ estado central ============ */
+function estadoInicial(){
+  return {
+    massaFonte: 10,      /* g de soluto na solução de partida */
+    volFonte: 100,       /* mL */
+    cInicial: 100,       /* g/L da solução inicial (para a série) */
+    volRetirar: 50,
+    volFinal: 100,
+    etapa: 'RETIRAR',    /* RETIRAR | TRANSFERIR | AGUA | MISTURAR | RESULTADO */
+    pipeta: { massa:0, vol:0 },
+    bequer: { massa:0, volSol:0, volAgua:0, misturado:false },
+    diluicoes: 0,
+    historico: [],
+    ultimo: null,
+    travado: false
+  };
+}
+var lab = estadoInicial();
+var serieN = 0;          /* quantos chips a série já mostrou */
+var baixaRes = 0;        /* quanto o reservatório de água esvaziou (px) */
+
+/* ============ utilidades ============ */
+function fmt(x, casas){
+  if(x === null || x === undefined || isNaN(x)) return '—';
+  var d = (casas === undefined) ? 4 : casas;
+  var n = Math.round(x * Math.pow(10, d)) / Math.pow(10, d);
+  return String(n).replace('.', ',');
+}
+function fmtM(m){ return fmt(m, m > 0 && m < 0.1 ? 4 : 3); }
+function conc(massa, volML){ return volML > 0 ? massa / (volML / 1000) : 0; }
+function cor(c){
+  var t = Math.pow(Math.max(0, Math.min(1, c / C_REF)), 0.6);
+  return 'hsl(' + HUE + ', ' + (22 + 60*t).toFixed(1) + '%, ' + (93 - 47*t).toFixed(1) + '%)';
+}
+function alturaML(v){ return Math.max(0, v / CAP * HMAX); }
+function setRect(r, h, off){ h = Math.max(0, h); r.setAttribute('height', h.toFixed(2)); r.setAttribute('y', (BOTTOM - off - h).toFixed(2)); }
+function pontos(m){ return m <= 0 ? 0 : Math.max(1, Math.min(46, Math.round(m * 2))); }
+
+var RND = [];
+(function(){ var s = 7; for(var i=0;i<60;i++){ s=(s*9301+49297)%233280; var a=s/233280; s=(s*9301+49297)%233280; RND.push({x:a,y:s/233280}); } })();
+
+/* ============ partículas de soluto ============
+   Cada béquer guarda suas partículas. Quando entram partículas novas, elas caem
+   de cima (do frasco ou da ponta da pipeta) e afundam na solução; depois ficam
+   balançando devagar. Quando o volume muda, deslizam para as novas posições.
+   agita/t: deslocamento (px) e tempo (ms) usados só durante a mistura. */
+var PM_LISTA = [];
+var PM_ORIGEM = {
+  'part-fonte': { x:135, y:96,  dx:12 },
+  'part-dil':   { x:445, y:150, dx:2.5 },
+  'cmp-part-a': { x:100, y:40,  dx:10 },
+  'cmp-part-b': { x:300, y:40,  dx:10 }
+};
+function pmCriar(grupo){
+  var M = { g:grupo, parts:[], reg:null, agita:0, tAg:0, queda:null,
+            origem: PM_ORIGEM[grupo.id] || { x:0, y:0, dx:6 },
+            painel: null };
+  var avo = grupo.parentNode && grupo.parentNode.parentNode;
+  M.queda = document.createElementNS('http://www.w3.org/2000/svg','g');
+  (avo || grupo.parentNode).appendChild(M.queda);
+  var el = grupo; while(el && !(el.classList && el.classList.contains('panel'))) el = el.parentNode;
+  M.painel = el;
+  PM_LISTA.push(M);
+  return M;
+}
+function pmNova(M, atraso){
+  var c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  c.setAttribute('r', '3.6');
+  c.setAttribute('fill', 'url(#gParticula)');
+  c.setAttribute('stroke', 'rgba(6,18,40,.45)');
+  c.setAttribute('stroke-width', '.6');
+  c.setAttribute('opacity', '0');
+  var o = M.origem;
+  var p = { el:c, u:Math.random(), v:Math.random(),
+            x:o.x + (Math.random()*2 - 1) * o.dx, y:o.y - Math.random()*6, vy:20 + Math.random()*30,
+            st:'cai', atraso:atraso,
+            w1:0.6 + Math.random()*0.9, w2:0.5 + Math.random()*0.8, f1:Math.random()*6.283, f2:Math.random()*6.283 };
+  M.queda.appendChild(c);
+  return p;
+}
+function desenharPontos(grupo, n, esq, larg, topo, alt, agita, t){
+  var M = grupo._pm || (grupo._pm = pmCriar(grupo));
+  if(n <= 0 || alt <= 2){
+    M.parts.forEach(function(p){ if(p.el.parentNode) p.el.parentNode.removeChild(p.el); });
+    M.parts = []; M.reg = null; return;
+  }
+  M.reg = { esq:esq, larg:larg, topo:topo, alt:alt };
+  M.agita = agita || 0; M.tAg = t || 0;
+  while(M.parts.length > n){
+    var r = M.parts.pop();
+    if(r.el.parentNode) r.el.parentNode.removeChild(r.el);
+  }
+  var novas = 0;
+  while(M.parts.length < n){ M.parts.push(pmNova(M, novas * 0.045)); novas++; }
+  if(reduzMov()) pmPasso(M, 1, 0, true);
+}
+function reduzMov(){ return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }
+function pmPasso(M, dt, T, direto){
+  var r = M.reg; if(!r) return;
+  var minX = r.esq + 5, maxX = r.esq + r.larg - 5;
+  M.parts.forEach(function(p){
+    var tx = r.esq + 8 + p.u * (r.larg - 16);
+    var ty = r.topo + 6 + p.v * Math.max(2, r.alt - 12);
+    /* balanço lento, como no simulador de concentração */
+    var bx = 1.4 * Math.sin(T * p.w1 + p.f1), by = 1.1 * Math.sin(T * p.w2 + p.f2);
+    if(M.agita > 0){
+      bx += M.agita * Math.sin(M.tAg * 0.007 * (1 + p.u * 1.8) + p.v * 6.283);
+      by += M.agita * 0.8 * Math.cos(M.tAg * 0.006 * (1 + p.v * 1.8) + p.u * 6.283);
+    }
+    if(direto){
+      p.st = 'nada'; p.x = tx; p.y = ty;
+      if(p.el.parentNode !== M.g) M.g.appendChild(p.el);
+    } else if(p.st === 'cai'){
+      if(p.atraso > 0){ p.atraso -= dt; p.el.setAttribute('opacity','0'); return; }
+      p.vy = Math.min(p.vy + 620 * dt, 240);
+      p.y += p.vy * dt;
+      p.x += (tx - p.x) * Math.min(1, dt * 1.2);
+      if(p.y >= r.topo + 2){ p.st = 'nada'; M.g.appendChild(p.el); }
+    } else {
+      /* dentro da solução: afunda/desliza suavemente até o lugar */
+      var k = 1 - Math.exp(-dt * (p.y < r.topo ? 9 : 3.2));
+      p.x += (tx + bx - p.x) * k;
+      p.y += (ty + by - p.y) * k;
+    }
+    var x = p.st === 'cai' ? p.x : Math.max(minX, Math.min(maxX, p.x));
+    p.el.setAttribute('cx', x.toFixed(1));
+    p.el.setAttribute('cy', p.y.toFixed(1));
+    p.el.setAttribute('opacity', '.95');
+  });
+}
+var pmUlt = null, pmT0 = null;
+function pmLoop(now){
+  if(pmUlt === null){ pmUlt = now; pmT0 = now; }
+  var dt = Math.min(0.05, (now - pmUlt) / 1000), T = (now - pmT0) / 1000;
+  pmUlt = now;
+  if(!reduzMov()){
+    PM_LISTA.forEach(function(M){
+      if(M.painel && !M.painel.classList.contains('ativo')) return;
+      pmPasso(M, dt, T, false);
+    });
+  }
+  requestAnimationFrame(pmLoop);
+}
+requestAnimationFrame(pmLoop);
+
+function tween(dur, passo, fim){
+  var t0 = null;
+  var reduz = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduz || dur <= 0){ passo(1); if(fim) fim(); return; }
+  function frame(now){
+    if(t0 === null) t0 = now;
+    var p = Math.min(1, (now - t0)/dur);
+    passo(p < 0.5 ? 2*p*p : 1 - Math.pow(-2*p+2,2)/2);
+    if(p < 1) requestAnimationFrame(frame); else if(fim) fim();
+  }
+  requestAnimationFrame(frame);
+}
+
+function diz(texto, tipo){
+  $('status').className = 'status' + (tipo ? ' ' + tipo : '');
+  $('status').querySelector('.tag').textContent = tipo === 'erro' ? 'ATENÇÃO' : tipo === 'ok' ? 'PRONTO' : 'AGORA';
+  $('status-txt').textContent = texto;
+}
+
+/* mensagem discreta de etapa concluída ("✓ Retirada concluída") */
+function feito(txt){
+  var el = $('feito');
+  el.textContent = txt || '';
+  el.classList.remove('anima');
+  if(txt){ void el.offsetWidth; el.classList.add('anima'); }
+}
+function pulsar(el, cls){
+  var c = cls || 'pulsar';
+  el.classList.remove(c); void el.getBoundingClientRect(); el.classList.add(c);
+}
+
+function moverPipeta(x, y){ $('pipeta').style.transform = 'translate(' + x + 'px,' + y + 'px)'; }
+function ondas(pref, on, y){
+  ['1','2'].forEach(function(k){
+    var e = $('onda-' + pref + '-' + k);
+    if(on){ e.setAttribute('cy', y.toFixed(1)); e.classList.add('on'); }
+    else e.classList.remove('on');
+  });
+}
+function nivelReservatorio(baixa){
+  baixaRes = baixa;
+  var r = $('res-agua');
+  r.setAttribute('y', (86 + baixa).toFixed(1));
+  r.setAttribute('height', (40 - baixa).toFixed(1));
+}
+
+/* ============ marcas de graduação ============ */
+(function marcas(){
+  var ns = 'http://www.w3.org/2000/svg';
+  [['marcas-fonte',198],['marcas-dil',508]].forEach(function(cfg){
+    var g = $(cfg[0]);
+    for(var i=1;i<=6;i++){
+      var v = i*25, y = BOTTOM - alturaML(v), larg = (v%50===0)?18:10;
+      var l = document.createElementNS(ns,'line');
+      l.setAttribute('x1', cfg[1]-larg); l.setAttribute('x2', cfg[1]);
+      l.setAttribute('y1', y); l.setAttribute('y2', y);
+      g.appendChild(l);
+      if(v%50===0){
+        var t = document.createElementNS(ns,'text');
+        t.setAttribute('x', cfg[1]-larg-5); t.setAttribute('y', y+4);
+        t.setAttribute('text-anchor','end'); t.setAttribute('font-size','11.5');
+        t.setAttribute('font-family','IBM Plex Mono, monospace');
+        t.setAttribute('fill','#6C7EA6'); t.setAttribute('stroke','none');
+        t.textContent = v; g.appendChild(t);
+      }
+    }
+  });
+})();
+
+/* ============ render ============ */
+function renderCena(){
+  /* béquer de partida */
+  var hF = alturaML(lab.volFonte);
+  setRect($('liq-fonte'), hF, 0);
+  var cF = conc(lab.massaFonte, lab.volFonte);
+  $('liq-fonte').style.fill = cor(cF);
+  desenharPontos($('part-fonte'), pontos(lab.massaFonte), 72, 126, BOTTOM - hF, hF);
+  $('lbl-fonte-c').textContent = lab.volFonte > 0 ? fmt(cF, 2) + ' g/L' : '—';
+  $('lbl-fonte-v').textContent = lab.volFonte > 0 ? fmt(lab.volFonte, 1) + ' mL · ' + fmtM(lab.massaFonte) + ' g' : 'vazio';
+
+  /* pipeta */
+  var hp = lab.pipeta.vol / 100 * PIP_HMAX;
+  $('pip-liq').setAttribute('height', Math.max(0,hp).toFixed(2));
+  $('pip-liq').setAttribute('y', (PIP_BOTTOM - Math.max(0,hp)).toFixed(2));
+  $('pip-liq').style.fill = cor(conc(lab.pipeta.massa, lab.pipeta.vol));
+
+  /* béquer de diluição */
+  var b = lab.bequer, total = b.volSol + b.volAgua;
+  if(b.misturado){
+    var hT = alturaML(total);
+    setRect($('liq-dil-sol'), hT, 0);
+    $('liq-dil-sol').style.fill = cor(conc(b.massa, total));
+    setRect($('liq-dil-agua'), 0, 0);
+    desenharPontos($('part-dil'), pontos(b.massa), 382, 126, BOTTOM - hT, hT);
+  } else {
+    var hs = alturaML(b.volSol);
+    setRect($('liq-dil-sol'), hs, 0);
+    $('liq-dil-sol').style.fill = cor(conc(b.massa, b.volSol));
+    setRect($('liq-dil-agua'), alturaML(b.volAgua), hs);
+    desenharPontos($('part-dil'), pontos(b.massa), 382, 126, BOTTOM - hs, hs);
+  }
+  if(total > 0){
+    $('lbl-dil-c').textContent = b.misturado ? fmt(conc(b.massa, total), 2) + ' g/L' : 'misturar';
+    $('lbl-dil-c').setAttribute('fill', b.misturado ? cor(Math.max(conc(b.massa,total), C_REF*0.18)) : '#7E90B8');
+    $('lbl-dil-v').textContent = fmt(total,1) + ' mL · ' + fmtM(b.massa) + ' g';
+  } else {
+    $('lbl-dil-c').textContent = '—';
+    $('lbl-dil-c').setAttribute('fill', '#7E90B8');
+    $('lbl-dil-v').textContent = 'vazio';
+  }
+
+  /* linha do volume final */
+  var mostraAlvo = (lab.etapa === 'AGUA');
+  $('alvo').setAttribute('class', mostraAlvo ? '' : 'oculto');
+  if(mostraAlvo){
+    var ya = BOTTOM - alturaML(lab.volFinal);
+    $('alvo-linha').setAttribute('y1', ya); $('alvo-linha').setAttribute('y2', ya);
+    $('alvo-txt').setAttribute('y', ya - 5);
+    $('alvo-txt').textContent = fmt(lab.volFinal,0) + ' mL';
+  }
+}
+
+function renderControles(){
+  var e = lab.etapa, b = lab.bequer;
+  var podePreparar = (e === 'RETIRAR' && lab.diluicoes === 0);
+  $('bloco-preparo').className = podePreparar ? '' : 'oculto';
+  $('in-massa').disabled = lab.travado;
+  $('in-volume').disabled = lab.travado;
+  $('bloco-retirar').className = 'slider' + (e === 'RETIRAR' ? '' : ' oculto');
+  $('bloco-final').className = 'slider' + (e === 'AGUA' ? '' : ' oculto');
+
+  var btn = $('btn-acao');
+  btn.disabled = lab.travado;
+  btn.className = 'btn act';
+  if(e === 'RETIRAR'){
+    $('in-retirar').max = Math.max(5, Math.min(100, lab.volFonte));
+    btn.textContent = 'Retirar ' + fmt(lab.volRetirar,0) + ' mL';
+  } else if(e === 'TRANSFERIR'){
+    btn.className = 'btn act c-sky';
+    btn.textContent = 'Transferir para o béquer';
+  } else if(e === 'AGUA'){
+    $('in-final').min = b.volSol + 5;
+    $('in-final').max = CAP;
+    btn.className = 'btn act c-amber';
+    btn.textContent = 'Adicionar água até ' + fmt(lab.volFinal,0) + ' mL';
+  } else if(e === 'MISTURAR'){
+    btn.className = 'btn act c-violet';
+    btn.textContent = 'Misturar';
+  } else {
+    btn.className = 'btn act c-green';
+    btn.textContent = 'Diluir de novo com esta solução';
+  }
+  $('btn-reset').disabled = lab.travado;
+  $('in-retirar').disabled = lab.travado;
+  $('in-final').disabled = lab.travado;
+}
+
+function renderLeitura(){
+  var b = lab.bequer, total = b.volSol + b.volAgua, m, v;
+  var naFonte = (lab.etapa === 'RETIRAR' || lab.etapa === 'TRANSFERIR');
+  $('ld-onde').textContent = naFonte ? 'No béquer de partida' : 'No béquer de diluição';
+  if(naFonte){
+    m = lab.massaFonte; v = lab.volFonte;
+    $('ld-c').textContent = v > 0 ? fmt(conc(m,v),2) + ' g/L' : '—';
+  } else {
+    m = b.massa; v = total;
+    $('ld-c').textContent = b.misturado ? fmt(conc(m,v),2) + ' g/L' : '? g/L';
+  }
+  $('ld-v').textContent = fmt(v,1) + ' mL';
+  $('ld-m').textContent = fmtM(m) + ' g';
+
+  var c = (v > 0) ? conc(m,v) : 0;
+  var mostraC = !(lab.etapa === 'AGUA' || lab.etapa === 'MISTURAR');
+  var eqTxt;
+  if(lab.etapa === 'AGUA' || lab.etapa === 'MISTURAR'){
+    var v2 = lab.etapa === 'AGUA' ? lab.volFinal : total;
+    eqTxt = fmt(conc(b.massa, b.volSol),2) + ' g/L · ' + fmt(b.volSol,1) + ' mL = C₂ · ' + fmt(v2,1) + ' mL  →  C₂ = ?';
+  } else if(lab.etapa === 'RESULTADO' && lab.ultimo){
+    eqTxt = 'C₂ = ' + fmt(lab.ultimo.c1,2) + ' · ' + fmt(lab.ultimo.v1,1) + ' ÷ ' + fmt(lab.ultimo.v2,1) + ' = ' + fmt(lab.ultimo.c2,2) + ' g/L';
+  } else {
+    eqTxt = v > 0 ? 'C = ' + fmtM(m) + ' g ÷ ' + fmt(v/1000,3) + ' L = ' + fmt(c,2) + ' g/L' : 'C = —';
+  }
+  $('eq-viva').textContent = eqTxt;
+  var f = $('med-fill');
+  f.style.width = (mostraC ? Math.max(2, Math.min(100, c / C_REF * 100)) : 0).toFixed(1) + '%';
+  f.style.background = cor(c);
+}
+
+function renderCalculo(){
+  var u = lab.ultimo;
+  if(!u){ $('card-calculo').className = 'card oculto'; return; }
+  $('card-calculo').className = 'card';
+  $('calc-rotulo').textContent = 'O que aconteceu · diluição ' + u.n;
+  var h = '';
+  h += '<span class="l fade">C₁ · V₁ = C₂ · V₂</span>';
+  h += '<span class="l">' + fmt(u.c1,2) + ' g/L · ' + fmt(u.v1,1) + ' mL = C₂ · ' + fmt(u.v2,1) + ' mL</span>';
+  h += '<span class="l">C₂ = (' + fmt(u.c1,2) + ' · ' + fmt(u.v1,1) + ') ÷ ' + fmt(u.v2,1) + '</span>';
+  h += '<span class="l res">C₂ = ' + fmt(u.c2,2) + ' g/L</span>';
+  h += '<span class="l solta fade">o soluto continuou o mesmo: ' + fmtM(u.massa) + ' g, agora em ' + fmt(u.v2,1) + ' mL</span>';
+  h += '<span class="l solta amb">a concentração ficou ' + fmt(u.c1/u.c2,2) + '× menor (V₂ ÷ V₁ = ' + fmt(u.v2/u.v1,2) + ')</span>';
+  $('calc-box').innerHTML = h;
+}
+
+function renderHistorico(){
+  var tb = $('hist-body');
+  while(tb.firstChild) tb.removeChild(tb.firstChild);
+  lab.historico.forEach(function(r){
+    var tr = document.createElement('tr');
+    [r.n, fmt(r.c1,2)+' g/L', fmt(r.v1,1)+' mL', fmt(r.v2,1)+' mL', fmt(r.c2,2)+' g/L'].forEach(function(t,i){
+      var td = document.createElement('td'); td.textContent = t;
+      if(i===4) td.className = 'c2';
+      tr.appendChild(td);
+    });
+    tb.appendChild(tr);
+  });
+  $('hist-vazio').style.display = lab.historico.length ? 'none' : 'block';
+}
+
+/* série: solução inicial → 1ª → 2ª ... */
+function renderSerie(){
+  var box = $('serie');
+  while(box.firstChild) box.removeChild(box.firstChild);
+  var base = lab.historico.length ? lab.historico[0].c1 : lab.cInicial;
+  var itens = [{ rot:'Inicial', c:base }];
+  lab.historico.forEach(function(r, i){ itens.push({ rot:(i+1) + 'ª', c:r.c2 }); });
+  itens.forEach(function(it, i){
+    var d = document.createElement('div');
+    d.className = 'chip' + ((i > 0 && i === itens.length - 1 && itens.length > serieN) ? ' novo' : '');
+    var t = document.createElement('i'); t.className = 'tubo'; t.style.setProperty('--fill', cor(it.c));
+    var b = document.createElement('b'); b.textContent = it.rot;
+    var s = document.createElement('span'); s.textContent = fmt(it.c,2) + ' g/L';
+    d.appendChild(t); d.appendChild(b); d.appendChild(s);
+    box.appendChild(d);
+  });
+  serieN = itens.length;
+}
+
+/* etapas: ✓ nas concluídas, destaque na atual */
+function renderEtapas(){
+  var cur = ETAPAS.indexOf(lab.etapa);
+  var itens = $('etapas').children;
+  for(var i=0;i<itens.length;i++){
+    var li = itens[i], dot = li.querySelector('.dot');
+    var feita = (i < cur) || lab.etapa === 'RESULTADO';
+    var atual = (i === cur) && lab.etapa !== 'RESULTADO';
+    li.className = 'step' + (feita ? ' feita' : (atual ? ' atual' : ''));
+    dot.textContent = feita ? '✓' : String(i+1);
+    if(atual) li.setAttribute('aria-current','step'); else li.removeAttribute('aria-current');
+  }
+}
+
+function render(){ renderCena(); renderControles(); renderLeitura(); renderCalculo(); renderHistorico(); renderSerie(); renderEtapas(); }
+
+/* ============ ações ============ */
+function acaoPrincipal(){
+  if(lab.travado) return;
+  var e = lab.etapa;
+  if(e === 'RETIRAR') retirar();
+  else if(e === 'TRANSFERIR') transferir();
+  else if(e === 'AGUA') adicionarAgua();
+  else if(e === 'MISTURAR') misturar();
+  else novaDiluicao();
+}
+
+/* RETIRAR: a pipeta desce, suga e sobe */
+function retirar(){
+  var v = lab.volRetirar;
+  if(v > lab.volFonte){
+    diz('Só há ' + fmt(lab.volFonte,1) + ' mL na solução de partida. Escolha um volume menor.', 'erro');
+    return;
+  }
+  var v0 = lab.volFonte, m0 = lab.massaFonte, cAtual = conc(m0, v0);
+  var massa = cAtual * v / 1000;
+  lab.travado = true; renderControles();
+  var superficie = BOTTOM - alturaML(v0);
+  var dy = Math.max(30, Math.min(175, superficie - 150 + 24));
+  $('pip-liq').style.fill = cor(cAtual);
+  diz('Retirando ' + fmt(v,1) + ' mL: a pipeta desce até a solução.');
+  moverPipeta(0, dy);
+  setTimeout(function(){
+    tween(850, function(p){
+      var restante = v0 - v*p;
+      setRect($('liq-fonte'), alturaML(restante), 0);
+      desenharPontos($('part-fonte'), pontos(m0 - massa*p), 72, 126, BOTTOM - alturaML(restante), alturaML(restante));
+      var hp = (v*p)/100*PIP_HMAX;
+      $('pip-liq').setAttribute('height', hp.toFixed(2));
+      $('pip-liq').setAttribute('y', (PIP_BOTTOM-hp).toFixed(2));
+    }, function(){
+      lab.volFonte = v0 - v;
+      lab.massaFonte = m0 - massa;
+      moverPipeta(0, 0);
+      setTimeout(function(){
+        lab.pipeta = { massa:massa, vol:v };
+        lab.etapa = 'TRANSFERIR';
+        lab.travado = false;
+        feito('✓ Retirada concluída');
+        diz('Na pipeta: ' + fmt(v,1) + ' mL com ' + fmtM(massa) + ' g de soluto. Agora transfira.');
+        render();
+      }, 720);
+    });
+  }, 780);
+}
+
+/* TRANSFERIR: a pipeta vai ao outro béquer e despeja */
+function transferir(){
+  var v = lab.pipeta.vol, m = lab.pipeta.massa, c = conc(m, v);
+  lab.travado = true; renderControles();
+  diz('A pipeta leva a amostra até o béquer de diluição.');
+  moverPipeta(X_PIP_DIL, 0);
+  $('jato-sol').setAttribute('stroke', cor(c));
+  setTimeout(function(){
+    $('jato-sol').classList.add('on');
+    tween(750, function(p){
+      var hp = (v*(1-p))/100*PIP_HMAX;
+      $('pip-liq').setAttribute('height', hp.toFixed(2));
+      $('pip-liq').setAttribute('y', (PIP_BOTTOM-hp).toFixed(2));
+      var hs = alturaML(v*p);
+      setRect($('liq-dil-sol'), hs, 0);
+      $('liq-dil-sol').style.fill = cor(c);
+      desenharPontos($('part-dil'), pontos(m*p), 382, 126, BOTTOM-hs, hs);
+      var ys = BOTTOM - hs;
+      $('jato-sol').setAttribute('y2', ys.toFixed(1));
+      ondas('sol', p > 0.03, ys);
+    }, function(){
+      $('jato-sol').classList.remove('on');
+      ondas('sol', false, 0);
+      moverPipeta(0, 0);
+      lab.bequer = { massa:m, volSol:v, volAgua:0, misturado:false };
+      lab.pipeta = { massa:0, vol:0 };
+      if(lab.volFinal < v + 5) lab.volFinal = Math.min(CAP, v + 50);
+      $('in-final').min = v + 5;
+      $('in-final').value = lab.volFinal;
+      $('lbl-final').textContent = fmt(lab.volFinal,0) + ' mL';
+      lab.etapa = 'AGUA';
+      lab.travado = false;
+      feito('✓ Solução transferida');
+      diz('Complete com água até ' + fmt(lab.volFinal,0) + ' mL. Você pode mudar o volume final.');
+      render();
+    });
+  }, 800);
+}
+
+/* ADICIONAR ÁGUA: o nível sobe até a linha tracejada */
+function adicionarAgua(){
+  var b = lab.bequer, atual = b.volSol + b.volAgua, alvo = lab.volFinal;
+  if(alvo <= b.volSol){
+    diz('O volume final precisa ser maior que os ' + fmt(b.volSol,1) + ' mL de solução. Sem água não há diluição.', 'erro');
+    return;
+  }
+  if(Math.abs(alvo - atual) < 1e-9){
+    lab.etapa = 'MISTURAR'; diz('Volume completo. Agora misture.'); render(); return;
+  }
+  lab.travado = true; renderControles();
+  diz('Adicionando água até ' + fmt(alvo,0) + ' mL.');
+  var ag0 = b.volAgua, dif = alvo - atual, hs = alturaML(b.volSol);
+  var jato = $('jato-agua'), luz = $('jato-agua-luz'), imp = $('agua-impacto');
+  var onda = $('agua-onda'), brilho = $('agua-brilho'), brilho2 = $('agua-brilho2');
+  var BICO = 142, X0 = 382, X1 = 508, KX = Math.PI * 2 / 69;
+  aguaAnimando = true;
+
+  function concluir(){
+    aguaAnimando = false;
+    [jato, luz, imp].forEach(function(e){ e.setAttribute('opacity','0'); });
+    onda.setAttribute('d',''); brilho.setAttribute('d',''); brilho2.setAttribute('d','');
+    lab.bequer.volAgua = ag0 + dif;
+    lab.etapa = 'MISTURAR';
+    lab.travado = false;
+    feito('✓ Água adicionada');
+    diz('Duas camadas: solução embaixo, água em cima. Misture.');
+    render();
+    var b0 = baixaRes;
+    tween(700, function(p){ nivelReservatorio(b0 * (1-p)); });
+  }
+  var reduz = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduz){ nivelReservatorio(0); concluir(); return; }
+
+  /* fases: jato cai do bico → enche (nível sobe) → jato termina de cair → superfície se acalma */
+  var T_CAI = 220, T_ENCHE = Math.max(900, Math.min(1600, dif * 12)), T_FIM = 220, T_CALMA = 750;
+  var TOTAL = T_CAI + T_ENCHE + T_FIM + T_CALMA, t0 = null;
+
+  function superficie(topo, amp, t, limite){
+    /* ondulação: duas senoides somadas, como no simulador de concentração */
+    var A = Math.min(limite, amp);
+    var pts = [];
+    for(var x = X0; x <= X1 + 0.1; x += 6){
+      var u = x - X0;
+      var borda = Math.min(3, (hs + limite) * 0.3) * (Math.exp(-u/5) + Math.exp(-(X1-x)/5)); /* menisco */
+      pts.push([x, topo + A * Math.sin(u*KX + t*2.1) + A*0.45*Math.sin(u*KX*2.3 - t*1.6) - borda]);
+    }
+    return pts;
+  }
+  function caminho(pts){ return pts.map(function(p,i){ return (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1); }).join(' '); }
+
+  function frame(now){
+    if(t0 === null) t0 = now;
+    var e = now - t0, t = e / 1000;
+    /* progresso do enchimento (suave no começo e no fim) */
+    var pe = Math.max(0, Math.min(1, (e - T_CAI) / T_ENCHE));
+    var pf = pe < 0.5 ? 2*pe*pe : 1 - Math.pow(-2*pe+2, 2)/2;
+    var va = ag0 + dif * pf, hW = alturaML(va), topo = BOTTOM - hs - hW;
+
+    /* agitação: forte enquanto o jato cai, depois diminui até parar */
+    var agita;
+    if(e < T_CAI) agita = 1.2 + 2.2 * (e / T_CAI);
+    else if(e < T_CAI + T_ENCHE + T_FIM) agita = 3.4;
+    else agita = 3.4 * Math.max(0, 1 - (e - T_CAI - T_ENCHE - T_FIM) / T_CALMA);
+    var amp = 0.7 + agita;
+
+    /* camada de água: retângulo + faixa ondulada no topo */
+    var faixa = Math.min(5, hW);
+    setRect($('liq-dil-agua'), Math.max(0, hW - faixa), hs);
+    if(hW > 0.6){
+      var pts = superficie(topo, amp, t, Math.max(0.5, faixa * 0.9));
+      var base = (topo + faixa).toFixed(1);
+      onda.setAttribute('d', caminho(pts) + ' L' + X1 + ' ' + base + ' L' + X0 + ' ' + base + ' Z');
+      brilho.setAttribute('d', caminho(pts));
+      if(hW > 10) brilho2.setAttribute('d', caminho(pts.map(function(p){ return [p[0], p[1] + 3.5]; })));
+      else brilho2.setAttribute('d', '');
+    } else {
+      onda.setAttribute('d',''); brilho.setAttribute('d',''); brilho2.setAttribute('d','');
+    }
+
+    /* jato: a frente cai do bico, depois a cauda se solta e cai */
+    var alvoY = topo + amp * Math.sin((480 - X0)*KX + t*2.1);
+    var frente, cauda = BICO;
+    if(e < T_CAI) frente = BICO + (alvoY - BICO) * Math.pow(e / T_CAI, 2);
+    else frente = alvoY;
+    if(e > T_CAI + T_ENCHE) cauda = BICO + (alvoY - BICO) * Math.min(1, Math.pow((e - T_CAI - T_ENCHE) / T_FIM, 2));
+    var ativo = e < T_CAI + T_ENCHE + T_FIM;
+    if(ativo){
+      var larg = 3.8 + Math.sin(t * 30) * 0.8;
+      jato.setAttribute('y1', cauda.toFixed(1)); jato.setAttribute('y2', frente.toFixed(1));
+      jato.setAttribute('stroke-width', larg.toFixed(2)); jato.setAttribute('opacity', '1');
+      luz.setAttribute('y1', cauda.toFixed(1)); luz.setAttribute('y2', frente.toFixed(1)); luz.setAttribute('opacity', '1');
+      var toca = e >= T_CAI * 0.9;
+      imp.setAttribute('cy', alvoY.toFixed(1));
+      imp.setAttribute('rx', (8 + Math.sin(t * 20) * 3).toFixed(1));
+      imp.setAttribute('opacity', toca ? '1' : '0');
+    } else {
+      jato.setAttribute('opacity','0'); luz.setAttribute('opacity','0'); imp.setAttribute('opacity','0');
+    }
+
+    nivelReservatorio(Math.min(1, dif/100) * 22 * pf);
+
+    if(e < TOTAL) requestAnimationFrame(frame);
+    else concluir();
+  }
+  requestAnimationFrame(frame);
+}
+
+/* MISTURAR: bastão, pontos se espalhando, cor uniformizando */
+function misturar(){
+  var b = lab.bequer, total = b.volSol + b.volAgua;
+  lab.travado = true; renderControles();
+  diz('Misturando: os pontos de soluto se espalham por todo o volume.');
+  var c0 = conc(b.massa, b.volSol), c1 = conc(b.massa, total);
+  var hs0 = alturaML(b.volSol), ha0 = alturaML(b.volAgua), n = pontos(b.massa);
+  $('grupo-dil').classList.add('mexendo');
+  $('bastao').classList.add('on');
+  tween(1900, function(p){
+    var hs = hs0 + ha0*p, ha = ha0*(1-p);
+    setRect($('liq-dil-sol'), hs, 0);
+    setRect($('liq-dil-agua'), ha, hs);
+    $('liq-dil-sol').style.fill = cor(c0 + (c1-c0)*p);
+    desenharPontos($('part-dil'), n, 382, 126, BOTTOM-hs, hs, 15 * Math.sin(Math.PI * p), (window.performance ? performance.now() : Date.now()));
+  }, function(){
+    $('grupo-dil').classList.remove('mexendo');
+    $('bastao').classList.remove('on');
+    lab.bequer.misturado = true;
+    var reg = {
+      n: lab.historico.length + 1,
+      c1: c0, v1: b.volSol, v2: total, c2: c1, massa: b.massa
+    };
+    lab.historico.push(reg);
+    lab.ultimo = reg;
+    lab.diluicoes += 1;
+    lab.etapa = 'RESULTADO';
+    lab.travado = false;
+    feito('✓ Solução misturada · ✓ Diluição concluída');
+    diz('Mesmo soluto, mais volume: ' + fmt(c0,2) + ' g/L virou ' + fmt(c1,2) + ' g/L.', 'ok');
+    render();
+    /* destaque do resultado */
+    pulsar($('ld-c'));
+    pulsar($('lbl-dil-c'));
+    pulsar($('card-calculo'), 'anima-entra');
+    $('contorno-dil').classList.add('ok');
+    setTimeout(function(){ $('contorno-dil').classList.remove('ok'); }, 1600);
+  });
+}
+
+/* DILUIR DE NOVO: a solução obtida vira a nova solução de partida */
+function novaDiluicao(){
+  var b = lab.bequer, total = b.volSol + b.volAgua;
+  var mNova = b.massa, vNova = total, cNova = conc(mNova, vNova);
+  var vOld = lab.volFonte, mOld = lab.massaFonte, cOld = conc(mOld, vOld);
+  lab.travado = true; renderControles();
+  diz('A solução diluída passa a ser a nova solução de partida.');
+  var hT = alturaML(total), hOld = alturaML(vOld);
+  tween(900, function(p){
+    var hF = hOld*(1-p) + hT*p;
+    setRect($('liq-fonte'), hF, 0);
+    $('liq-fonte').style.fill = cor(cOld + (cNova - cOld)*p);
+    desenharPontos($('part-fonte'), pontos(mOld*(1-p) + mNova*p), 72, 126, BOTTOM - hF, hF);
+    var hd = hT*(1-p);
+    setRect($('liq-dil-sol'), hd, 0);
+    desenharPontos($('part-dil'), pontos(mNova*(1-p)), 382, 126, BOTTOM - hd, hd);
+  }, function(){
+    lab.massaFonte = mNova;
+    lab.volFonte = vNova;
+    lab.bequer = { massa:0, volSol:0, volAgua:0, misturado:false };
+    lab.ultimo = null;
+    lab.etapa = 'RETIRAR';
+    lab.travado = false;
+    if(lab.volRetirar > lab.volFonte) lab.volRetirar = Math.max(5, Math.round(lab.volFonte/2/5)*5);
+    $('in-retirar').max = Math.max(5, Math.min(100, lab.volFonte));
+    $('in-retirar').value = lab.volRetirar;
+    $('lbl-retirar').textContent = fmt(lab.volRetirar,0) + ' mL';
+    feito('');
+    diz('Nova solução de partida: ' + fmt(cNova,2) + ' g/L. Retire ' + fmt(lab.volRetirar,0) + ' mL para a próxima diluição.');
+    render();
+  });
+}
+
+function reiniciar(){
+  if(lab.travado) return;
+  lab = estadoInicial();
+  serieN = 0;
+  moverPipeta(0, 0);
+  $('grupo-dil').classList.remove('mexendo');
+  $('bastao').classList.remove('on');
+  ['jato-agua','jato-agua-luz','agua-impacto'].forEach(function(id){ $(id).setAttribute('opacity','0'); });
+  ['agua-onda','agua-brilho','agua-brilho2'].forEach(function(id){ $(id).setAttribute('d',''); });
+  $('jato-sol').classList.remove('on');
+  ondas('sol', false, 0); ondas('agua', false, 0);
+  nivelReservatorio(0);
+  $('in-massa').value = 10; $('in-volume').value = 100;
+  $('lbl-massa').textContent = '10 g'; $('lbl-volume').textContent = '100 mL';
+  $('in-retirar').min = 5; $('in-retirar').max = 100; $('in-retirar').value = 50;
+  $('in-final').min = 10; $('in-final').max = CAP; $('in-final').value = 100;
+  $('lbl-retirar').textContent = '50 mL';
+  $('lbl-final').textContent = '100 mL';
+  feito('');
+  diz('Tudo do começo: 10 g em 100 mL = 100 g/L.');
+  render();
+}
+
+$('btn-acao').addEventListener('click', acaoPrincipal);
+$('btn-reset').addEventListener('click', reiniciar);
+$('in-retirar').addEventListener('input', function(){
+  lab.volRetirar = parseFloat(this.value);
+  $('lbl-retirar').textContent = fmt(lab.volRetirar,0) + ' mL';
+  renderControles();
+});
+$('in-final').addEventListener('input', function(){
+  lab.volFinal = parseFloat(this.value);
+  $('lbl-final').textContent = fmt(lab.volFinal,0) + ' mL';
+  renderControles();
+  renderCena();
+  renderLeitura();
+});
+
+function preparar(){
+  lab.massaFonte = parseFloat($('in-massa').value);
+  lab.volFonte = parseFloat($('in-volume').value);
+  lab.cInicial = conc(lab.massaFonte, lab.volFonte);
+  $('lbl-massa').textContent = fmt(lab.massaFonte,0) + ' g';
+  $('lbl-volume').textContent = fmt(lab.volFonte,0) + ' mL';
+  if(lab.volRetirar > lab.volFonte){
+    lab.volRetirar = Math.max(5, Math.round(lab.volFonte/2/5)*5);
+    $('in-retirar').value = lab.volRetirar;
+    $('lbl-retirar').textContent = fmt(lab.volRetirar,0) + ' mL';
+  }
+  diz(fmt(lab.massaFonte,0) + ' g em ' + fmt(lab.volFonte,0) + ' mL = ' + fmt(conc(lab.massaFonte,lab.volFonte),2) + ' g/L.');
+  render();
+}
+$('in-massa').addEventListener('input', preparar);
+$('in-volume').addEventListener('input', preparar);
+
+/* ============ como usar ============ */
+function abrirComo(){ $('overlay-como').hidden = false; $('btn-fechar-como').focus(); }
+function fecharComo(){ $('overlay-como').hidden = true; $('btn-como').focus(); }
+$('btn-como').addEventListener('click', abrirComo);
+$('btn-fechar-como').addEventListener('click', fecharComo);
+$('overlay-como').addEventListener('click', function(ev){ if(ev.target === this) fecharComo(); });
+document.addEventListener('keydown', function(ev){ if(ev.key === 'Escape' && !$('overlay-como').hidden) fecharComo(); });
+
+/* ============ abas ============ */
+var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+function abrir(id, focar){
+  tabs.forEach(function(t){
+    var sel = t.getAttribute('data-tab') === id;
+    t.setAttribute('aria-selected', sel ? 'true':'false');
+    t.setAttribute('tabindex', sel ? '0':'-1');
+    if(sel && focar) t.focus();
+  });
+  ['t1','t2','t3'].forEach(function(k){
+    var p = $('painel-'+k);
+    if(p) p.className = 'panel' + (k === id ? ' ativo':'');
+  });
+}
+tabs.forEach(function(t){
+  t.addEventListener('click', function(){ abrir(t.getAttribute('data-tab'), false); });
+  t.addEventListener('keydown', function(ev){
+    var i = tabs.indexOf(t), n = null;
+    if(ev.key === 'ArrowRight') n = (i+1)%tabs.length;
+    else if(ev.key === 'ArrowLeft') n = (i-1+tabs.length)%tabs.length;
+    else if(ev.key === 'Home') n = 0;
+    else if(ev.key === 'End') n = tabs.length-1;
+    if(n !== null){ ev.preventDefault(); abrir(tabs[n].getAttribute('data-tab'), true); }
+  });
+});
+/* botões "Fazer no laboratório" */
+Array.prototype.slice.call(document.querySelectorAll('[data-ir]')).forEach(function(b){
+  b.addEventListener('click', function(){
+    abrir(b.getAttribute('data-ir'), false);
+    try{ window.scrollTo({ top: 0, behavior: 'smooth' }); }catch(e){ window.scrollTo(0, 0); }
+  });
+});
+
+/* ============ conceitos: antes e depois da água ============ */
+function renderComparacao(){
+  var vA = 50, mA = 5, cA = 100;
+  var vB = parseFloat($('cmp-vol').value);
+  var cB = cA * vA / vB;
+  var capC = 200, base = 206, topoMax = 62, alt = base - topoMax;
+
+  var hA = vA / capC * alt, yA = base - hA;
+  $('cmp-liq-a').setAttribute('y', yA.toFixed(1));
+  $('cmp-liq-a').setAttribute('height', hA.toFixed(1));
+  $('cmp-liq-a').setAttribute('fill', cor(cA));
+  desenharPontos($('cmp-part-a'), pontos(mA), 42, 116, yA, hA);
+
+  var hB = vB / capC * alt, yB = base - hB;
+  $('cmp-liq-b').setAttribute('y', yB.toFixed(1));
+  $('cmp-liq-b').setAttribute('height', hB.toFixed(1));
+  $('cmp-liq-b').setAttribute('fill', cor(cB));
+  desenharPontos($('cmp-part-b'), pontos(mA), 242, 116, yB, hB);
+
+  $('cmp-lbl-a').textContent = fmt(cA,1) + ' g/L';
+  $('cmp-sub-a').textContent = vA + ' mL · ' + mA + ' g';
+  $('cmp-lbl-b').textContent = fmt(cB,1) + ' g/L';
+  $('cmp-lbl-b').setAttribute('fill', cor(Math.max(cB, 20)));
+  $('cmp-sub-b').textContent = vB + ' mL · ' + mA + ' g';
+  $('cmp-lbl-vol').textContent = vB + ' mL';
+
+  var vd = $('cmp-veredito');
+  if(vB === vA) vd.textContent = 'Sem água não há diluição: a concentração continua ' + fmt(cA,0) + ' g/L.';
+  else vd.textContent = 'C₂ = (100 · 50) ÷ ' + vB + ' = ' + fmt(cB,1) + ' g/L → ' + fmt(vB / vA, 2) + '× menos concentrada, com os mesmos ' + mA + ' g de soluto.';
+}
+(function marcasCmp(){
+  var ns = 'http://www.w3.org/2000/svg';
+  [['cmp-marcas-a',158],['cmp-marcas-b',358]].forEach(function(cfg){
+    var g = $(cfg[0]);
+    for(var i=1;i<=4;i++){
+      var y = 206 - i*(144/4);
+      var l = document.createElementNS(ns,'line');
+      l.setAttribute('x1', cfg[1]-(i%2===0?14:8)); l.setAttribute('x2', cfg[1]);
+      l.setAttribute('y1', y); l.setAttribute('y2', y);
+      g.appendChild(l);
+    }
+  });
+})();
+$('cmp-vol').addEventListener('input', renderComparacao);
+
+/* ============ conceitos: série 100 → 50 → 25 → 12,5 → 6,25 ============ */
+function renderSerieConceito(){
+  var box = $('serie-conceito'), c = 100, h = '';
+  var rots = ['Solução inicial','1ª diluição','2ª diluição','3ª diluição','4ª diluição'];
+  for(var i=0;i<rots.length;i++){
+    h += '<div class="nivel"><i class="tubo" style="--fill:' + cor(c) + '"></i><div><b>' + rots[i] + '</b><span>' + fmt(c,2) + ' g/L</span></div></div>';
+    if(i < rots.length - 1) h += '<div class="seta">↓ retirar 50 mL · completar até 100 mL</div>';
+    c = c / 2;
+  }
+  box.innerHTML = h;
+}
+
+/* ============ desenho auxiliar: solução em miniatura (quiz) ============ */
+function miniSolucao(idx, x, m, v, rot){
+  var capm = 320, base = 96, topo = 22, larg = 76;
+  var h = Math.max(9, Math.min(base-topo, v/capm*(base-topo)));
+  var y = base - h, c = m/(v/1000), g = '';
+  g += '<clipPath id="mini'+idx+'"><rect x="'+(x+2)+'" y="'+topo+'" width="'+(larg-4)+'" height="'+(base-topo)+'" rx="8"/></clipPath>';
+  g += '<g clip-path="url(#mini'+idx+')">';
+  g += '<rect x="'+(x+2)+'" y="'+y.toFixed(1)+'" width="'+(larg-4)+'" height="'+h.toFixed(1)+'" fill="'+cor(c)+'"/>';
+  var n = pontos(m);
+  for(var i=0;i<n && i<RND.length;i++){
+    var cx = x + 8 + RND[i].x*(larg-16);
+    var cy = y + 5 + RND[i].y*Math.max(2, h-10);
+    g += '<circle cx="'+cx.toFixed(1)+'" cy="'+cy.toFixed(1)+'" r="3" fill="#0B1220" opacity=".72"/>';
+  }
+  g += '</g>';
+  g += '<path d="M'+x+' '+topo+' L'+x+' '+(base-8)+' Q'+x+' '+base+' '+(x+10)+' '+base+' L'+(x+larg-10)+' '+base+' Q'+(x+larg)+' '+base+' '+(x+larg)+' '+(base-8)+' L'+(x+larg)+' '+topo+'" fill="none" stroke="rgba(220,232,250,.55)" stroke-width="2"/>';
+  g += '<text x="'+(x+larg/2)+'" y="15" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10.5" fill="#7E90B8">'+rot+'</text>';
+  g += '<text x="'+(x+larg/2)+'" y="'+(base+16)+'" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="11" fill="#93A3C0">'+fmt(m,2)+' g · '+v+' mL</text>';
+  return g;
+}
+function painelMini(lista, prefixo){
+  var svg = '<div class="mini"><svg viewBox="0 0 340 120" role="img" aria-label="Soluções representadas com pontos de soluto">';
+  lista.forEach(function(it, i){
+    svg += miniSolucao(prefixo + i, 12 + i*110, it.m, it.v, String.fromCharCode(65+i));
+  });
+  return svg + '</svg></div>';
+}
+
+/* ============ quiz ============ */
+/* fixo:true → não embaralha as alternativas (ex.: "A / B / C" que se referem ao desenho) */
+var BANCO = [
+  /* diluição */
+  { id:1, q:'O que significa diluir uma solução?',
+    opts:['Adicionar mais soluto','Adicionar solvente e diminuir a concentração','Evaporar a água da solução','Aquecer a solução'], certa:1,
+    expl:'Diluir é acrescentar solvente (aqui, água). O soluto continua o mesmo, mas fica mais espalhado.' },
+  { id:2, q:'No experimento com água e corante, quem é o soluto?',
+    opts:['A água','O corante','O béquer','A pipeta'], certa:1,
+    expl:'Soluto é o que está dissolvido. A água, que dissolve, é o solvente.' },
+  { id:3, q:'Ao adicionar água a uma solução, a quantidade de soluto:',
+    opts:['aumenta','diminui','permanece a mesma','vira zero'], certa:2,
+    expl:'A água só aumenta o volume. O soluto que já estava lá continua lá.' },
+  { id:4, q:'Depois de uma diluição, a solução fica:',
+    opts:['mais concentrada','menos concentrada','com a mesma concentração','sem soluto'], certa:1,
+    calc:'C = m / V, com V maior',
+    expl:'Mesma massa de soluto em mais volume: menos soluto por litro.' },
+  { id:5, q:'Por que a cor fica mais clara quando se adiciona água?',
+    opts:['O soluto evaporou','O mesmo soluto se espalhou em um volume maior','A água tem cor branca','A massa de soluto diminuiu'], certa:1,
+    expl:'A cor acompanha a concentração. No simulador, ela é uma representação didática.' },
+  { id:6, q:'Qual destas ações NÃO dilui uma solução?',
+    opts:['Adicionar água','Completar o volume com mais solvente','Dissolver mais soluto','Misturar com água pura'], certa:2,
+    expl:'Dissolver mais soluto aumenta a concentração, o contrário de diluir.' },
+  { id:7, q:'Numa diluição, o que permanece constante?',
+    opts:['O volume','A concentração','A massa de soluto da amostra','A cor'], certa:2,
+    calc:'C₁ · V₁ = C₂ · V₂',
+    expl:'É essa conservação da massa de soluto que dá origem à fórmula.' },
+
+  /* diluição seriada e procedimento */
+  { id:8, q:'O que é uma diluição seriada?',
+    opts:['Uma diluição feita com muita água de uma só vez','Várias diluições em sequência, cada uma partindo da solução anterior','Misturar soluções de corantes diferentes','Evaporar a solução em etapas'], certa:1,
+    expl:'A cada etapa, a solução obtida vira a solução inicial da próxima.' },
+  { id:9, q:'Na diluição seriada, a solução obtida em uma etapa é usada:',
+    opts:['Como solução inicial da etapa seguinte','Só para medir a cor','Descartada','Para ser aquecida'], certa:0,
+    expl:'É isso que forma a “série”: cada solução alimenta a próxima diluição.' },
+  { id:10, q:'Qual é a ordem correta de uma diluição no laboratório?',
+    opts:['Retirar → transferir → adicionar água → misturar','Misturar → retirar → transferir → adicionar água','Adicionar água → retirar → misturar → transferir','Transferir → misturar → retirar → adicionar água'], certa:0,
+    expl:'Primeiro se retira e transfere a amostra; depois entra a água; por fim, mistura-se.' },
+  { id:11, q:'Para que serve misturar depois de adicionar água?',
+    opts:['Para a concentração ficar uniforme','Para aquecer a solução','Para aumentar a massa de soluto','Para evaporar a água'], certa:0,
+    expl:'Sem misturar, a solução fica em camadas e a concentração não é a mesma em todo o volume.' },
+  { id:12, q:'No simulador, por que a concentração aparece como “?” antes de misturar?',
+    opts:['Porque a solução ainda não está uniforme','Porque a água some','Porque o soluto foi perdido','Porque a pipeta quebrou'], certa:0,
+    expl:'Antes de misturar há duas camadas (solução e água). Só depois a concentração é a mesma em todo o béquer.' },
+  { id:13, q:'Qual é a função da pipeta no experimento?',
+    opts:['Medir e transferir um volume da solução','Dissolver o soluto','Produzir água','Esquentar a solução'], certa:0,
+    expl:'A pipeta retira uma amostra de volume conhecido e a leva ao outro recipiente.' },
+  { id:14, q:'Qual botão do simulador usa a solução recém-diluída como ponto de partida?',
+    opts:['Reiniciar','Retirar','Diluir de novo','Misturar'], certa:2,
+    expl:'“Diluir de novo” transforma a solução obtida na nova solução de partida.' },
+  { id:15, q:'Retirar uma amostra muda a concentração da solução que ficou no béquer de partida?',
+    opts:['Sim, diminui','Sim, aumenta','Não, continua igual','Vira zero'], certa:2,
+    expl:'A amostra leva soluto e solução na mesma proporção. Só o volume que sobra é menor.' },
+  { id:16, q:'Logo depois de transferir a amostra, e antes de adicionar água, a concentração no béquer de diluição é:',
+    opts:['zero','igual à da solução de partida','maior que a da solução de partida','menor que a da solução de partida'], certa:1,
+    expl:'É a mesma solução, apenas em menor volume. A concentração só muda quando entra água.' },
+
+  /* fórmula C₁·V₁ = C₂·V₂ */
+  { id:17, q:'Na fórmula C₁ · V₁ = C₂ · V₂, o que é V₁?',
+    opts:['O volume final','O volume de solução usado na diluição','O volume de água adicionada','A massa de soluto'], certa:1,
+    expl:'V₁ é o volume retirado da solução inicial (a amostra).' },
+  { id:18, q:'Na fórmula C₁ · V₁ = C₂ · V₂, o que representa C₂?',
+    opts:['A concentração antes da diluição','A concentração depois da diluição','O volume final','A massa de soluto'], certa:1,
+    expl:'C₂ é a concentração final, depois de completar com água e misturar.' },
+  { id:19, q:'50 mL de uma solução de 100 g/L são completados até 100 mL. Qual é a nova concentração?',
+    opts:['25 g/L','50 g/L','100 g/L','200 g/L'], certa:1,
+    calc:'C₂ = (100 · 50) ÷ 100 = 50 g/L',
+    expl:'O volume dobrou, então a concentração caiu à metade.' },
+  { id:20, q:'25 mL de uma solução de 80 g/L são completados até 100 mL. Qual é a concentração final?',
+    opts:['10 g/L','20 g/L','32 g/L','40 g/L'], certa:1,
+    calc:'C₂ = (80 · 25) ÷ 100 = 20 g/L',
+    expl:'O volume ficou 4 vezes maior, então a concentração ficou 4 vezes menor.' },
+  { id:21, q:'10 mL de uma solução de 60 g/L são completados até 40 mL. Qual é a concentração final?',
+    opts:['6 g/L','15 g/L','24 g/L','150 g/L'], certa:1,
+    calc:'C₂ = (60 · 10) ÷ 40 = 15 g/L',
+    expl:'40 mL é 4 vezes 10 mL, então 60 g/L viram 15 g/L.' },
+  { id:22, q:'20 mL de uma solução de 200 g/L são diluídos até 100 mL. Qual é a concentração final?',
+    opts:['20 g/L','40 g/L','100 g/L','1000 g/L'], certa:1,
+    calc:'C₂ = (200 · 20) ÷ 100 = 40 g/L',
+    expl:'O volume ficou 5 vezes maior, então a concentração ficou 5 vezes menor.' },
+  { id:23, q:'Você usa 50 mL de uma solução de 40 g/L e quer obter 10 g/L. Qual deve ser o volume final?',
+    opts:['100 mL','150 mL','200 mL','400 mL'], certa:2,
+    calc:'V₂ = (40 · 50) ÷ 10 = 200 mL',
+    expl:'Como já há 50 mL de solução, faltam 150 mL de água.' },
+  { id:24, q:'Você tem uma solução de 50 g/L e usa 20 mL dela. Qual volume final dá uma solução de 10 g/L?',
+    opts:['40 mL','60 mL','100 mL','200 mL'], certa:2,
+    calc:'V₂ = (50 · 20) ÷ 10 = 100 mL',
+    expl:'Como V₂ = 100 mL e já há 20 mL de solução, faltam 80 mL de água.' },
+  { id:25, q:'Um aluno usa 25 mL de solução e completa até 100 mL. Quanta água ele adicionou?',
+    opts:['25 mL','50 mL','75 mL','100 mL'], certa:2,
+    calc:'100 mL − 25 mL = 75 mL',
+    expl:'A água adicionada é o volume final menos o volume da amostra.' },
+  { id:26, q:'Se o volume final V₂ é o dobro do volume usado V₁, a concentração final é:',
+    opts:['o dobro da inicial','a metade da inicial','igual à inicial','um quarto da inicial'], certa:1,
+    calc:'C₂ = C₁ · V₁ ÷ V₂ = C₁ ÷ 2',
+    expl:'Quanto maior o volume final, menor a concentração, na mesma proporção.' },
+  { id:27, q:'Se V₂ é 4 vezes V₁, a concentração final fica:',
+    opts:['4 vezes maior','4 vezes menor','2 vezes menor','igual'], certa:1,
+    calc:'C₂ = C₁ ÷ 4',
+    expl:'O fator de diluição (V₂ ÷ V₁) é o mesmo fator pelo qual a concentração diminui.' },
+  { id:28, q:'Uma solução de 100 g/L é diluída de modo que V₂ = 5 · V₁. A concentração final é:',
+    opts:['5 g/L','20 g/L','50 g/L','500 g/L'], certa:1,
+    calc:'C₂ = 100 ÷ 5 = 20 g/L',
+    expl:'Dividir a concentração por 5 é o mesmo que multiplicar o volume por 5.' },
+  { id:29, q:'Você quer 25 g/L a partir de 50 mL de uma solução de 100 g/L. Qual deve ser o volume final?',
+    opts:['100 mL','150 mL','200 mL','250 mL'], certa:2,
+    calc:'V₂ = (100 · 50) ÷ 25 = 200 mL',
+    expl:'A concentração cai 4 vezes, então o volume final precisa ser 4 vezes maior.' },
+  { id:30, q:'Numa fórmula C₁ · V₁ = C₂ · V₂, posso usar os volumes em mL?',
+    opts:['Sim, desde que V₁ e V₂ estejam na mesma unidade','Não, só em litros','Só se a concentração for em mol/L','Sim, mas apenas V₁'], certa:0,
+    expl:'A razão V₁ ÷ V₂ não depende da unidade. Já C = m/V em g/L pede o volume em litros.' },
+
+  /* concentração e massa de soluto */
+  { id:31, q:'Qual massa de soluto há em 50 mL de uma solução de 100 g/L?',
+    opts:['0,5 g','5 g','50 g','500 g'], certa:1,
+    calc:'m = 100 g/L × 0,05 L = 5 g',
+    expl:'Esse soluto permanece todo na solução diluída.' },
+  { id:32, q:'Depois que 50 mL de uma solução de 100 g/L são completados até 100 mL, quanto soluto há no béquer?',
+    opts:['2,5 g','5 g','10 g','50 g'], certa:1,
+    calc:'m = 100 × 0,05 = 5 g (antes e depois)',
+    expl:'A água não traz soluto: são os mesmos 5 g da amostra.' },
+  { id:33, q:'Qual massa de soluto há em 10 mL de uma solução de 30 g/L?',
+    opts:['0,03 g','0,3 g','3 g','30 g'], certa:1,
+    calc:'m = 30 g/L × 0,01 L = 0,3 g',
+    expl:'Cuidado com a unidade: 10 mL = 0,01 L.' },
+  { id:34, q:'Qual massa de soluto há em 200 mL de solução a 15 g/L?',
+    opts:['0,3 g','3 g','15 g','30 g'], certa:1,
+    calc:'m = 15 g/L × 0,2 L = 3 g',
+    expl:'Cuidado com a unidade: 200 mL = 0,2 L.' },
+  { id:35, q:'Uma solução tem 6 g de soluto em 300 mL. Qual é a concentração?',
+    opts:['2 g/L','18 g/L','20 g/L','200 g/L'], certa:2,
+    calc:'C = 6 g ÷ 0,3 L = 20 g/L',
+    expl:'Passe o volume para litros antes de dividir.' },
+  { id:36, q:'Quanto soluto é necessário para preparar 500 mL de solução a 4 g/L?',
+    opts:['0,5 g','2 g','4 g','8 g'], certa:1,
+    calc:'m = 4 g/L × 0,5 L = 2 g',
+    expl:'Passe o volume para litros antes de multiplicar.' },
+  { id:37, q:'Se a massa de soluto dobra e o volume não muda, a concentração:',
+    opts:['dobra','cai pela metade','não muda','quadruplica'], certa:0,
+    calc:'C = 2m ÷ V = 2 · (m ÷ V)',
+    expl:'Concentração e massa de soluto variam na mesma proporção quando o volume é fixo.' },
+  { id:38, q:'Quanta massa de soluto a pipeta retira ao coletar uma amostra?',
+    opts:['Só depende do volume retirado','Depende do volume retirado e da concentração da solução','Só depende da cor','Depende apenas da temperatura'], certa:1,
+    calc:'m = C × V',
+    expl:'Uma amostra maior, ou de solução mais concentrada, leva mais soluto.' },
+
+  /* séries */
+  { id:39, q:'Uma série começa em 100 g/L e cada etapa usa 50 mL completados até 100 mL. Qual é a concentração após a 2ª diluição?',
+    opts:['12,5 g/L','25 g/L','50 g/L','75 g/L'], certa:1,
+    calc:'100 → 50 → 25 g/L',
+    expl:'Cada etapa divide a concentração por 2.' },
+  { id:40, q:'Na mesma série (100 g/L, 50 mL até 100 mL), qual é a concentração após a 3ª diluição?',
+    opts:['6,25 g/L','12,5 g/L','25 g/L','33,3 g/L'], certa:1,
+    calc:'100 → 50 → 25 → 12,5 g/L',
+    expl:'Três divisões por 2 equivalem a dividir por 8: 100 ÷ 8 = 12,5.' },
+  { id:41, q:'Uma solução de 80 g/L passa por três diluições, cada uma cortando a concentração pela metade. Ela termina com:',
+    opts:['40 g/L','20 g/L','10 g/L','5 g/L'], certa:2,
+    calc:'80 → 40 → 20 → 10 g/L',
+    expl:'É a lógica da diluição seriada: cada etapa divide pelo mesmo fator.' },
+  { id:42, q:'Uma série pela metade começa em 64 g/L. Qual é a concentração após 4 diluições?',
+    opts:['2 g/L','4 g/L','8 g/L','16 g/L'], certa:1,
+    calc:'64 → 32 → 16 → 8 → 4 g/L',
+    expl:'Quatro divisões por 2 equivalem a dividir por 16.' },
+  { id:43, q:'Se 20 mL são completados até 100 mL, o fator de diluição (V₂ ÷ V₁) é:',
+    opts:['2×','4×','5×','20×'], certa:2,
+    calc:'100 ÷ 20 = 5',
+    expl:'A concentração fica 5 vezes menor.' },
+  { id:44, q:'Uma série tem fator de diluição 5 em cada etapa e começa em 500 g/L. Após 2 etapas, a concentração é:',
+    opts:['20 g/L','50 g/L','100 g/L','250 g/L'], certa:0,
+    calc:'500 → 100 → 20 g/L',
+    expl:'Duas divisões por 5 equivalem a dividir por 25.' },
+  { id:45, q:'Por que a concentração cai de forma controlada numa diluição seriada?',
+    opts:['Porque cada etapa divide a concentração pelo mesmo fator','Porque a cor muda sozinha','Porque a água evapora','Porque o soluto desaparece'], certa:0,
+    expl:'Se os volumes são os mesmos em todas as etapas, o fator de diluição também é.' },
+  { id:46, q:'Em uma série de diluições, qual solução é a menos concentrada?',
+    opts:['A solução inicial','A 1ª diluição','A 2ª diluição','A 3ª diluição'], certa:3, fixo:true,
+    expl:'Cada etapa diminui a concentração, então a última é a mais fraca.' },
+  { id:47, q:'Ao longo de uma diluição seriada, a cor da solução fica:',
+    opts:['mais escura a cada etapa','mais clara a cada etapa','sempre igual','com outro tom a cada etapa'], certa:1,
+    expl:'A cor mais clara acompanha a concentração menor (representação didática).' },
+
+  /* comparar soluções (com desenho) */
+  { id:48, q:'Observe as três soluções. Qual é a mais concentrada?', visual:[{m:4,v:100},{m:6,v:300},{m:2,v:80}],
+    opts:['A','B','C','As três são iguais'], certa:0, fixo:true,
+    calc:'A: 4 ÷ 0,1 = 40 g/L · B: 6 ÷ 0,3 = 20 g/L · C: 2 ÷ 0,08 = 25 g/L',
+    expl:'Mais soluto não significa mais concentrado: B tem a maior massa e é a mais fraca.' },
+  { id:49, q:'Observe as duas soluções. Qual é a mais concentrada?', visual:[{m:3,v:100},{m:6,v:300}],
+    opts:['A','B','As duas são iguais','Falta informação'], certa:0, fixo:true,
+    calc:'A: 3 ÷ 0,1 = 30 g/L · B: 6 ÷ 0,3 = 20 g/L',
+    expl:'B tem o dobro de soluto, mas o triplo de volume.' },
+  { id:50, q:'Observe as três soluções. Qual é a menos concentrada?', visual:[{m:2,v:50},{m:5,v:250},{m:3,v:100}],
+    opts:['A','B','C','Todas iguais'], certa:1, fixo:true,
+    calc:'A: 40 g/L · B: 20 g/L · C: 30 g/L',
+    expl:'Compare sempre massa dividida por volume, nunca só a massa.' },
+  { id:51, q:'As duas soluções têm a mesma massa de soluto. Qual é a menos concentrada?', visual:[{m:5,v:50},{m:5,v:100}],
+    opts:['A','B','As duas são iguais','Falta informação'], certa:1, fixo:true,
+    calc:'A: 5 ÷ 0,05 = 100 g/L · B: 5 ÷ 0,1 = 50 g/L',
+    expl:'B é o que se obtém completando A com água até 100 mL.' },
+  { id:52, q:'A solução X tem 8 g em 400 mL e a Y tem 3 g em 100 mL. Qual é a mais concentrada?',
+    opts:['X','Y','As duas são iguais','Não dá para comparar'], certa:1, fixo:true,
+    calc:'X: 8 ÷ 0,4 = 20 g/L · Y: 3 ÷ 0,1 = 30 g/L',
+    expl:'X tem mais soluto, mas também bem mais volume.' },
+
+  /* interpretar o simulador e situações práticas */
+  { id:53, q:'No simulador, você retira 30 mL de uma solução de 90 g/L e completa até 90 mL. O resultado é:',
+    opts:['10 g/L','30 g/L','60 g/L','270 g/L'], certa:1,
+    calc:'C₂ = (90 · 30) ÷ 90 = 30 g/L',
+    expl:'O volume ficou 3 vezes maior, então a concentração ficou 3 vezes menor.' },
+  { id:54, q:'Na tabela de diluições, o “C final” de uma linha é, na diluição seguinte:',
+    opts:['o C inicial','o volume final','a massa retirada','sempre zero'], certa:0,
+    expl:'Quem usa “Diluir de novo” parte da solução que acabou de obter.' },
+  { id:55, q:'Para deixar um suco concentrado menos forte, você deve:',
+    opts:['acrescentar água','acrescentar mais pó','evaporar parte da água','deixar esfriar'], certa:0,
+    expl:'É uma diluição: mais solvente para o mesmo soluto.' },
+  { id:56, q:'Você tem 1 L de suco e acrescenta 1 L de água, sem pôr mais pó. A concentração do suco fica:',
+    opts:['o dobro','a metade','igual','um quarto'], certa:1,
+    calc:'V₂ = 2 L = 2 · V₁ → C₂ = C₁ ÷ 2',
+    expl:'O mesmo pó, agora em o dobro do volume.' },
+  { id:57, q:'25 mL de uma solução de 120 g/L são completados até 75 mL. Qual é a concentração final?',
+    opts:['40 g/L','30 g/L','90 g/L','360 g/L'], certa:0,
+    calc:'C₂ = (120 · 25) ÷ 75 = 40 g/L',
+    expl:'O volume ficou 3 vezes maior, então a concentração ficou 3 vezes menor.' },
+  { id:58, q:'Para preparar 100 mL de solução a 20 g/L a partir de uma solução de 80 g/L, quanto deve ser retirado?',
+    opts:['25 mL','20 mL','40 mL','80 mL'], certa:0,
+    calc:'V₁ = (20 · 100) ÷ 80 = 25 mL',
+    expl:'Isolando V₁: V₁ = C₂ · V₂ ÷ C₁. Depois, completa-se com água até 100 mL.' },
+  { id:59, q:'Um aluno pegou 50 mL de solução a 100 g/L e, em vez de completar até 100 mL, adicionou 100 mL de água. Que concentração obteve?',
+    opts:['50 g/L','33,3 g/L','25 g/L','100 g/L'], certa:1,
+    calc:'V₂ = 50 + 100 = 150 mL → C₂ = (100 · 50) ÷ 150 ≈ 33,3 g/L',
+    expl:'O volume final ficou 150 mL, não 100 mL: a solução ficou mais diluída do que o planejado.' },
+  { id:60, q:'No experimento, o que significa “completar até 100 mL”?',
+    opts:['Adicionar água até o volume total chegar a 100 mL','Adicionar exatamente 100 mL de água','Retirar 100 mL da solução','Misturar durante 100 segundos'], certa:0,
+    expl:'No simulador é a linha tracejada: a água sobe até ela, e esse total é o V₂.' },
+  { id:61, q:'Partindo de C₁ = 100 g/L, um aluno calculou C₂ = 150 g/L depois de diluir. O que isso indica?',
+    opts:['Houve erro: diluir nunca aumenta a concentração','Está certo: a água concentra a solução','Está certo, se ele misturou bem','Está certo, se usou pouca água'], certa:0,
+    expl:'Na diluição V₂ é maior que V₁, então C₂ é menor que C₁. Provavelmente ele trocou V₁ e V₂.' },
+  { id:62, q:'Um rótulo diz: “misture 1 parte do concentrado com 4 partes de água”. O suco pronto fica, em relação ao concentrado:',
+    opts:['5 vezes menos concentrado','4 vezes menos concentrado','4 vezes mais concentrado','com a mesma concentração'], certa:0,
+    calc:'V₂ = 1 + 4 = 5 partes → C₂ = C₁ ÷ 5',
+    expl:'O volume final é de 5 partes, e não de 4.' },
+  { id:63, q:'O béquer A tem 50 mL a 40 g/L. O béquer B tem 100 mL a 20 g/L. Qual tem mais soluto?',
+    opts:['Os dois têm a mesma quantidade: 2 g','A','B','Não dá para saber'], certa:0,
+    calc:'A: 40 · 0,05 = 2 g · B: 20 · 0,1 = 2 g',
+    expl:'É o que acontece numa diluição: o mesmo soluto, o dobro do volume, metade da concentração.' },
+  { id:64, q:'Partindo de 100 g/L e diluindo sempre pela metade, em qual etapa a concentração fica abaixo de 10 g/L pela primeira vez?',
+    opts:['Na 3ª','Na 4ª','Na 5ª','Na 10ª'], certa:1, fixo:true,
+    calc:'100 → 50 → 25 → 12,5 → 6,25 g/L',
+    expl:'Na 3ª etapa ainda são 12,5 g/L; só na 4ª passa para 6,25 g/L.' },
+  { id:65, q:'Qual procedimento reduz a concentração a um quarto em uma única etapa?',
+    opts:['Retirar 25 mL e completar até 100 mL','Retirar 50 mL e completar até 100 mL','Retirar 25 mL e completar até 50 mL','Retirar 75 mL e completar até 100 mL'], certa:0,
+    calc:'V₂ ÷ V₁ = 100 ÷ 25 = 4',
+    expl:'As outras opções dividem a concentração por 2, por 2 e por cerca de 1,33.' },
+  { id:66, q:'Estas soluções saíram de uma mesma diluição seriada. Da solução inicial até a mais diluída, a ordem é:', visual:[{m:2.5,v:100},{m:10,v:100},{m:5,v:100}],
+    opts:['B → C → A','A → C → B','C → B → A','A → B → C'], certa:0,
+    calc:'B: 100 g/L · C: 50 g/L · A: 25 g/L',
+    expl:'A cada etapa a concentração cai: a mais concentrada veio primeiro.' },
+  { id:67, q:'Por que vale a pena calcular C₂ antes de misturar?',
+    opts:['Para prever o resultado e depois conferir no experimento','Porque o cálculo muda a cor da solução','Porque sem o cálculo a solução não se mistura','Não faz diferença'], certa:0,
+    expl:'A cor ajuda a perceber a diluição, mas o valor exato vem do cálculo.' },
+  { id:68, q:'5 mL de uma solução de 200 g/L são completados até 50 mL. Qual é a nova concentração?',
+    opts:['20 g/L','40 g/L','10 g/L','2 g/L'], certa:0,
+    calc:'C₂ = (200 · 5) ÷ 50 = 20 g/L',
+    expl:'O volume ficou 10 vezes maior, então a concentração ficou 10 vezes menor.' },
+  { id:69, q:'Uma série com fator de diluição 10 em cada etapa começa em 200 g/L. Após 2 etapas, a concentração é:',
+    opts:['2 g/L','20 g/L','100 g/L','0,2 g/L'], certa:0,
+    calc:'200 → 20 → 2 g/L',
+    expl:'Duas divisões por 10 equivalem a dividir por 100.' },
+  { id:70, q:'No laboratório, você partiu de 100 g/L, retirou 20 mL e completou até 80 mL. Que valor deve aparecer depois de misturar?',
+    opts:['25 g/L','20 g/L','80 g/L','40 g/L'], certa:0,
+    calc:'C₂ = (100 · 20) ÷ 80 = 25 g/L',
+    expl:'Faça a conta antes de misturar e confira no simulador.' }
+];
+var N_QUIZ = 10;
+var quizAtual = [], qi = 0, acertos = 0, escolha = null, respondida = false, usadas = [], resultados = [], melhor = null;
+
+function embaralhar(arr){
+  var c = arr.slice();
+  for(var i = c.length - 1; i > 0; i--){
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = c[i]; c[i] = c[j]; c[j] = t;
+  }
+  return c;
+}
+/* cópia da questão com as alternativas embaralhadas (e "certa" recalculada) */
+function prepararQuestao(q){
+  var idx = q.opts.map(function(_, i){ return i; });
+  if(!q.fixo) idx = embaralhar(idx);
+  return {
+    id: q.id, q: q.q, visual: q.visual, calc: q.calc, expl: q.expl,
+    opts: idx.map(function(i){ return q.opts[i]; }),
+    certa: idx.indexOf(q.certa)
+  };
+}
+function ids(lista){ return lista.map(function(q){ return q.id; }); }
+
+/* sorteia 10 perguntas sem repetição, priorizando as que ainda não apareceram */
+function sortearQuiz(){
+  var novas = BANCO.filter(function(q){ return usadas.indexOf(q.id) === -1; });
+  var escolhidas;
+  if(novas.length >= N_QUIZ){
+    escolhidas = embaralhar(novas).slice(0, N_QUIZ);
+    usadas = usadas.concat(ids(escolhidas));
+  } else {
+    var resto = embaralhar(BANCO.filter(function(q){ return novas.indexOf(q) === -1; })).slice(0, N_QUIZ - novas.length);
+    escolhidas = novas.concat(resto);
+    usadas = ids(escolhidas);          /* começa um novo ciclo */
+  }
+  quizAtual = embaralhar(escolhidas).map(prepararQuestao);
+  qi = 0; acertos = 0; escolha = null; respondida = false; resultados = [];
+  renderQuiz(true);
+}
+
+function letra(i){ return String.fromCharCode(65 + i); }
+
+function renderQuiz(anima){
+  var box = $('quiz'), N = quizAtual.length;
+
+  /* ---- tela final ---- */
+  if(qi >= N){
+    var pct = Math.round(acertos / N * 100);
+    if(melhor === null || acertos > melhor) melhor = acertos;
+    var msg = acertos === N ? 'Perfeito! Você domina a diluição seriada.'
+      : pct >= 70 ? 'Muito bem! Teste no laboratório os valores das perguntas que errou.'
+      : 'Vale reler a aba Conceitos e refazer uma diluição no laboratório antes de tentar de novo.';
+    box.innerHTML = '<div class="qend">' +
+      '<p class="plabel">Resultado</p><h3>Quiz concluído!</h3>' +
+      '<div class="big">' + acertos + '<small>/' + N + '</small></div>' +
+      '<p class="rotulo">Acertos: ' + acertos + '/' + N + ' · ' + pct + '%</p>' +
+      '<div class="resumo" aria-label="Resumo das respostas">' + resultados.map(function(ok, i){
+        return '<i class="' + (ok ? 'ok' : 'no') + '" title="Pergunta ' + (i+1) + '">' + (ok ? '✓' : '✕') + '</i>'; }).join('') + '</div>' +
+      '<p>' + msg + (melhor !== null ? ' Melhor resultado nesta sessão: ' + melhor + '/' + N + '.' : '') + '</p>' +
+      '<div class="qacoes" style="justify-content:center"><button class="btn act" type="button" id="q-novo">Nova tentativa</button></div>' +
+      '</div>';
+    $('q-novo').addEventListener('click', function(){ sortearQuiz(); focarPergunta(); });
+    return;
+  }
+
+  /* ---- pergunta atual ---- */
+  var q = quizAtual[qi];
+  var h = '<div class="qprog"><span>Pergunta <b>' + (qi+1) + '</b> de ' + N + '</span><span>Acertos: <b>' + acertos + '</b></span></div>' +
+    '<div class="qbar"><i style="width:' + (qi / N * 100) + '%"></i></div>' +
+    '<div class="qcorpo' + (anima ? ' entra' : '') + '">' +
+    '<p class="qtext" id="q-texto" tabindex="-1">' + q.q + '</p>' +
+    (q.visual ? painelMini(q.visual, 'q' + q.id + '_') : '') +
+    '<div class="opts" role="radiogroup" aria-label="Alternativas">' +
+    q.opts.map(function(op, j){
+      return '<button type="button" class="opt" role="radio" aria-checked="false" data-i="' + j + '"><span class="radio" aria-hidden="true"></span><b>' + letra(j) + ')</b><span>' + op + '</span></button>';
+    }).join('') + '</div>' +
+    '<div id="q-fb"></div>' +
+    '<div class="qacoes"><button class="btn act" type="button" id="q-acao" disabled>Responder</button></div>' +
+    '</div>';
+  box.innerHTML = h;
+  escolha = null; respondida = false;
+
+  var botoes = Array.prototype.slice.call(box.querySelectorAll('.opt'));
+  botoes.forEach(function(b){
+    b.addEventListener('click', function(){
+      if(respondida) return;
+      escolha = +b.getAttribute('data-i');
+      botoes.forEach(function(x){
+        var sel = x === b;
+        x.classList.toggle('sel', sel);
+        x.setAttribute('aria-checked', sel ? 'true' : 'false');
+      });
+      $('q-acao').disabled = false;
+    });
+  });
+  $('q-acao').addEventListener('click', function(){
+    if(!respondida) responder(botoes);
+    else { qi++; renderQuiz(true); focarPergunta(); }
+  });
+}
+
+function responder(botoes){
+  if(escolha === null) return;
+  var q = quizAtual[qi], certo = escolha === q.certa;
+  respondida = true;
+  if(certo) acertos++;
+  resultados.push(certo);
+  botoes.forEach(function(x, j){
+    x.disabled = true;
+    x.classList.remove('sel');
+    if(j === q.certa) x.classList.add('right');
+    else if(j === escolha) x.classList.add('wrong');
+    else x.classList.add('apaga');
+  });
+  var fb = $('q-fb');
+  fb.className = 'qfb ' + (certo ? 'ok' : 'no');
+  fb.innerHTML = '<span class="st">' + (certo ? '✓ Correto!' : '✕ Incorreto. A resposta certa é a letra ' + letra(q.certa) + '.') + '</span>' +
+    (q.calc ? '<span class="cl">' + q.calc + '</span>' : '') + q.expl;
+  var prog = document.querySelector('#quiz .qprog b + b, #quiz .qprog span:last-child b');
+  if(prog) prog.textContent = acertos;
+  var bar = document.querySelector('#quiz .qbar i');
+  if(bar) bar.style.width = ((qi + 1) / quizAtual.length * 100) + '%';
+  var bt = $('q-acao');
+  bt.textContent = qi === quizAtual.length - 1 ? 'Ver resultado' : 'Próxima pergunta';
+  bt.className = 'btn act ' + (certo ? 'c-green' : 'c-sky');
+  bt.focus({preventScroll:true});
+}
+
+function focarPergunta(){
+  var box = $('quiz');
+  if(box.getBoundingClientRect().top < 0){
+    try{ box.scrollIntoView({behavior:'smooth', block:'start'}); }catch(e){ box.scrollIntoView(); }
+  }
+  var t = $('q-texto');
+  if(t) t.focus({preventScroll:true});
+}
+
+
+/* ============ superfície do líquido: ondinha que balança quando o nível muda ============ */
+var aguaAnimando = false;
+var SUPS = {
+  f:{ rects:['liq-fonte'], cap:'cap-fonte', clip:'onda-fonte-clip', sup:'sup-fonte', x0:72, x1:198, full:'M60 0 L210 0 L210 360 L60 360 Z', E:0, prev:null, fase:0 },
+  d:{ rects:['liq-dil-sol','liq-dil-agua'], cap:'cap-dil', clip:'onda-dil-clip', sup:'sup-dil', x0:382, x1:508, full:'M370 0 L520 0 L520 360 L370 360 Z', E:0, prev:null, fase:1.7 },
+  /* aba Conceitos: béqueres "antes" e "depois da água" */
+  a:{ rects:['cmp-liq-a'], cap:'cap-a', clip:'onda-a-clip', sup:'sup-a', x0:42, x1:158, fundo:206, full:'M30 0 L170 0 L170 230 L30 230 Z', E:0, prev:null, fase:0.6, suave:true },
+  b:{ rects:['cmp-liq-b'], cap:'cap-b', clip:'onda-b-clip', sup:'sup-b', x0:242, x1:358, fundo:206, full:'M230 0 L370 0 L370 230 L230 230 Z', E:0, prev:null, fase:2.3, suave:true }
+};
+/* no conceito, o nível acompanha o controle deslizando suavemente até o novo valor */
+function nivelSuave(S, dt){
+  var r = $(S.rects[0]), y = parseFloat(r.getAttribute('y')), h = parseFloat(r.getAttribute('height')) || 0;
+  var fundo = y + h;
+  if(S.escrito === undefined || Math.abs(y - S.escrito) > 0.01){ S.alvo = y; if(S.vis === undefined) S.vis = y; }
+  S.vis += (S.alvo - S.vis) * (1 - Math.exp(-dt * 4.5));
+  if(Math.abs(S.alvo - S.vis) < 0.02) S.vis = S.alvo;
+  r.setAttribute('y', S.vis.toFixed(2));
+  r.setAttribute('height', Math.max(0, fundo - S.vis).toFixed(2));
+  S.escrito = parseFloat(S.vis.toFixed(2));
+}
+var ondaT0 = null, ondaUlt = null;
+function superficieBalanca(k, t, dt){
+  var S = SUPS[k], topo = null, topRect = null, FUNDO = S.fundo || BOTTOM;
+  if(S.suave) nivelSuave(S, dt);
+  S.rects.forEach(function(id){
+    var r = $(id), h = parseFloat(r.getAttribute('height')) || 0, y = parseFloat(r.getAttribute('y'));
+    if(h > 0.3 && (topo === null || y < topo)){ topo = y; topRect = r; }
+  });
+  var clip = $(S.clip), cap = $(S.cap), sup = $(S.sup);
+  if(topo === null || (k === 'd' && aguaAnimando)){
+    clip.setAttribute('d', S.full); cap.setAttribute('height', '0'); sup.setAttribute('d', '');
+    S.prev = null; if(k === 'd' && aguaAnimando) S.E = 0;
+    return;
+  }
+  /* energia: cresce quando o nível se move e decai aos poucos */
+  var dy = S.prev === null ? 0 : Math.abs(topo - S.prev);
+  S.prev = topo;
+  S.E = Math.min(4.2, S.E + dy * 0.8) * Math.exp(-dt * 1.5);
+  var mexe = (k === 'd' && $('grupo-dil').classList.contains('mexendo')) ? 1.6 : 0;
+  var prof = FUNDO - topo;
+  var amp = Math.min(prof * 0.35, 0.6 + S.E + mexe);
+  var x0 = S.x0, x1 = S.x1, kx = Math.PI * 2 / 69, pts = [];
+  for(var x = x0; x <= x1 + 0.1; x += 6){
+    var u = x - x0, w = x1 - x;
+    var men = Math.min(3, prof * 0.3) * (Math.exp(-u / 5) + Math.exp(-w / 5));
+    pts.push(x.toFixed(1) + ' ' + (topo + amp * Math.sin(u*kx + t*2.1 + S.fase) + amp*0.45*Math.sin(u*kx*2.3 - t*1.6 + S.fase) - men).toFixed(1));
+  }
+  var linha = 'M' + pts.join(' L');
+  clip.setAttribute('d', 'M' + (x0 - 4) + ' ' + pts[0].split(' ')[1] + ' L' + pts.join(' L') + ' L' + (x1 + 4) + ' ' + pts[pts.length-1].split(' ')[1] + ' L' + (x1 + 4) + ' ' + (FUNDO + 30) + ' L' + (x0 - 4) + ' ' + (FUNDO + 30) + ' Z');
+  /* "tampa" da mesma cor da camada de cima, para preencher as cristas acima do nível */
+  var alto = amp + 4;
+  cap.setAttribute('y', (topo - alto).toFixed(2));
+  cap.setAttribute('height', alto.toFixed(2));
+  cap.style.fill = topRect.style.fill || topRect.getAttribute('fill');
+  cap.setAttribute('opacity', topRect.getAttribute('opacity') || '1');
+  sup.setAttribute('d', linha);
+}
+function loopOnda(now){
+  if(ondaT0 === null){ ondaT0 = now; ondaUlt = now; }
+  var dt = Math.min(0.05, (now - ondaUlt) / 1000), t = (now - ondaT0) / 1000;
+  ondaUlt = now;
+  if($('painel-t2').classList.contains('ativo')){
+    superficieBalanca('f', t, dt);
+    superficieBalanca('d', t, dt);
+  }
+  if($('painel-t1').classList.contains('ativo')){
+    superficieBalanca('a', t, dt);
+    superficieBalanca('b', t, dt);
+  }
+  requestAnimationFrame(loopOnda);
+}
+if(!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) requestAnimationFrame(loopOnda);
+
+/* ============ início ============ */
+renderComparacao();
+renderSerieConceito();
+sortearQuiz();
+render();
+diz('Retire ' + fmt(lab.volRetirar,0) + ' mL da solução de 100 g/L (10 g em 100 mL). Dá para ajustar soluto e volume antes.');
+})();
+</script>
+</body>
+</html>
